@@ -65,7 +65,12 @@
 				"noImplicitBoolean": "error",
 				"useConsistentArrayType": "error",
 				"useBlockStatements": "error",
-				"useNamingConvention": "error"
+				"useNamingConvention": {
+					"level": "error",
+					"options": {
+						"strictCase": false
+					}
+				}
 			},
 			"a11y": {
 				"all": true
