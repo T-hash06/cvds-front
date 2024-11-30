@@ -8,6 +8,7 @@ import {
 	Scripts,
 	ScrollRestoration,
 } from '@remix-run/react';
+import { AxiosProvider } from '@shared/hooks/axios';
 
 import './tailwind.css';
 
@@ -46,5 +47,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-	return <Outlet />;
+	return (
+		<AxiosProvider>
+			<Outlet />
+		</AxiosProvider>
+	);
 }
