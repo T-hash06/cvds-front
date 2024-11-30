@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 html,
-body {
+body,
+div[data-overlay-container="true"] {
 	@apply bg-background w-dvw h-dvh overflow-hidden;
 
 	@media (prefers-color-scheme: dark) {
@@ -13,5 +14,5 @@ body {
 
 * {
 	@apply p-0 m-0 box-border;
-	@apply font-[Montserrat,_sans-serif];
+	@apply font-[Roboto,_sans-serif];
 }
