@@ -1,0 +1,13 @@
+branch_name=$(git symbolic-ref --short HEAD)
+
+if [ "$branch_name" = "main" ]; then
+    echo "You cannot commit directly to the main branch."
+    exit 1
+fi
+
+if [ "$branch_name" = "develop" ]; then
+    echo "You cannot commit directly to the develop branch."
+    exit 1
+fi
+
+pnpm check
