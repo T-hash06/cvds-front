@@ -1,0 +1,47 @@
+.header {
+	@apply bg-background flex justify-center;
+
+	.headerWrapper {
+		@apply flex items-center justify-between w-full h-full max-w-7xl;
+	}
+
+	.titleWrapper {
+		@apply flex items-center gap-2;
+
+		.headerTitle {
+			@apply text-4xl font-bold;
+		}
+
+		.headerImage {
+			@apply w-44 mt-24;
+		}
+	}
+
+	.headerButtonsContainer {
+		@apply flex gap-4;
+	}
+}
+
+.loginPage {
+	@apply grid grid-rows-[5rem,_1fr] w-full h-full bg-gradient-to-t from-primary-300 to-secondary-300;
+
+	.loginForm {
+		@apply flex flex-col w-full max-w-sm rounded-small p-8 gap-6 bg-background shadow-large;
+
+		.formTitle {
+			@apply text-2xl font-light;
+		}
+
+		.forgotPasswordText {
+			@apply text-small text-center;
+		}
+
+		.forgotPasswordLink {
+			@apply text-primary;
+		}
+	}
+
+	.loginContent {
+		@apply flex flex-col items-center justify-center gap-4 w-full;
+	}
+}

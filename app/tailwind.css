@@ -3,10 +3,16 @@
 @tailwind utilities;
 
 html,
-body {
-	@apply bg-white dark:bg-gray-950;
+body,
+div[data-overlay-container="true"] {
+	@apply bg-background w-dvw h-dvh overflow-hidden;
 
 	@media (prefers-color-scheme: dark) {
 		color-scheme: dark;
 	}
+}
+
+* {
+	@apply p-0 m-0 box-border;
+	@apply font-[Roboto,_sans-serif];
 }
