@@ -67,7 +67,7 @@ function axiosInstance() {
 		(error) => {
 			if (error.response?.status === 401) {
 				cookies.remove('$$id');
-				navigate('/login');
+				navigate('/auth/login');
 			}
 
 			return Promise.reject(error);
