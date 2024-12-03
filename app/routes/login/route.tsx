@@ -1,7 +1,10 @@
 import { Button, Checkbox, Input } from '@nextui-org/react';
+import { Link } from '@remix-run/react';
 import { useAxios } from '@shared/hooks/axios';
 
 import logo from '@shared/assets/logo.png';
+import cookies from 'js-cookie';
+import React from 'react';
 import styles from './login.module.css';
 
 export { meta } from './meta';
@@ -14,9 +17,9 @@ const ForgotPassword = () => {
 	return (
 		<p className={styles.forgotPasswordText}>
 			Olvidaste tu contraseña?{' '}
-			<a href='/#' className={styles.forgotPasswordLink}>
+			<Link to='/login' className={styles.forgotPasswordLink}>
 				Recupérala aquí
-			</a>
+			</Link>
 		</p>
 	);
 };
@@ -47,14 +50,39 @@ const Header = () => {
 };
 
 const MainContent = () => {
+	const axios = useAxios();
+
+	const onSubmit = React.useCallback(
+		async (event: React.FormEvent<HTMLFormElement>) => {
+			event.preventDefault();
+			const formData = new FormData(event.currentTarget);
+			const credentials = Object.fromEntries(formData);
+
+			const response = await axios.post('/auth/login', credentials);
+
+			cookies.set('$$id', response.data);
+		},
+		[axios.post],
+	);
+
 	return (
 		<section className={styles.loginContent}>
-			<form className={styles.loginForm}>
+			<form className={styles.loginForm} onSubmit={onSubmit}>
 				<Title />
-				<Input type='text' placeholder='Nombre de usuario' />
-				<Input type='password' placeholder='Contraseña' />
+				<Input
+					type='text'
+					placeholder='Nombre de usuario'
+					name='username'
+				/>
+				<Input
+					type='password'
+					placeholder='Contraseña'
+					name='password'
+				/>
 				<Checkbox size='sm'>Recordarme</Checkbox>
-				<Button color='primary'>Iniciar Sesión</Button>
+				<Button color='primary' type='submit'>
+					Iniciar Sesión
+				</Button>
 				<ForgotPassword />
 			</form>
 		</section>
@@ -62,8 +90,6 @@ const MainContent = () => {
 };
 
 const LoginRoute = () => {
-	const _axios = useAxios();
-
 	return (
 		<main className={styles.loginPage}>
 			<Header />
