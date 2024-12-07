@@ -57,7 +57,7 @@ const EjemplaresPage = () => {
   const [newEjemplar, setNewEjemplar] = useState<Ejemplar>({
     estado: "",
     disponible: false,
-    libro: libroId || "",
+    libro: libroId ?? "",
   });
 
   useEffect(() => {

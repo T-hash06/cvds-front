@@ -25,38 +25,69 @@ import { useNavigate } from "@remix-run/react";
 
 const API_URL = "http://localhost:8080";
 
+interface Categoria {
+  idCategoria?: string;
+  nombre: string;
+}
+
 interface Subcategoria {
   idSubcategoria?: string;
   nombre: string;
+  categorias?: Categoria[];
 }
 
 const SubcategoriasPage = () => {
   const navigate = useNavigate();
-  const categoriaId = localStorage.getItem("categoriaId");
-  const nombreCategoria = localStorage.getItem("nombreCategoria");
 
-  useEffect(() => {
-    if (!categoriaId) {
-      navigate("/categorias");
-    }
-  }, [categoriaId, navigate]);
-
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [selectedCategoria, setSelectedCategoria] = useState<Categoria | null>(null);
+  const [newCategoria, setNewCategoria] = useState<Categoria>({ nombre: "" });
+  const [showAddCategoriaModal, setShowAddCategoriaModal] = useState(false);
+  const [showSubcategoriasModal, setShowSubcategoriasModal] = useState(false);
   const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([]);
-  const [selectedSubcategoria, setSelectedSubcategoria] = useState<Subcategoria | null>(null);
   const [newSubcategoria, setNewSubcategoria] = useState<Subcategoria>({ nombre: "" });
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddSubcategoriaModal, setShowAddSubcategoriaModal] = useState(false);
 
   useEffect(() => {
-    fetchSubcategorias();
+    fetchCategorias();
   }, []);
 
-  const fetchSubcategorias = async () => {
+  const fetchCategorias = async () => {
     try {
-      const response = await axios.get(`${API_URL}/categorias/${categoriaId}`);
+      const response = await axios.get(`${API_URL}/categorias`);
+      setCategorias(response.data);
+      toast.success("Categorías cargadas satisfactoriamente");
+    } catch (error) {
+      console.error("Error al obtener categorías:", error);
+      toast.error("No se pudo cargar las categorías");
+    }
+  };
+
+  const handleAddCategoria = async () => {
+    try {
+      const response = await axios.post(`${API_URL}/categorias`, newCategoria);
       const categoria = response.data;
-      setSubcategorias(categoria.subcategorias || []);
-      toast.success("Subcategorías cargadas satisfactoriamente");
+      // Add default subcategoria 'default' and associate with the new categoria
+      await axios.post(`${API_URL}/subcategorias`, {
+        nombre: "default",
+        categorias: [categoria],
+      });
+      setCategorias([...categorias, categoria]);
+      setShowAddCategoriaModal(false);
+      setNewCategoria({ nombre: "" });
+      toast.success("Categoría añadida con subcategoría 'default'");
+    } catch (error) {
+      console.error("Error al añadir la categoría:", error);
+      toast.error("No se pudo añadir la categoría");
+    }
+  };
+
+  const handleSubcategoriasClick = async (categoria: Categoria) => {
+    try {
+      const response = await axios.get(`${API_URL}/subcategorias/byCategoria/${categoria.idCategoria}`);
+      setSubcategorias(response.data);
+      setSelectedCategoria(categoria);
+      setShowSubcategoriasModal(true);
     } catch (error) {
       console.error("Error al obtener subcategorías:", error);
       toast.error("No se pudo cargar las subcategorías");
@@ -64,158 +95,147 @@ const SubcategoriasPage = () => {
   };
 
   const handleAddSubcategoria = async () => {
-    try {
-      const response = await axios.post(`${API_URL}/subcategorias`, newSubcategoria);
-      setSubcategorias([...subcategorias, response.data]);
-      setShowAddModal(false);
-      setNewSubcategoria({ nombre: "" });
-      toast.success("Subcategoría añadida satisfactoriamente");
-    } catch (error) {
-      console.error("Error al añadir la subcategoría:", error);
-      toast.error("No se pudo añadir la subcategoría");
-    }
-  };
-
-  const handleSaveEdit = async () => {
-    if (selectedSubcategoria) {
+    if (selectedCategoria) {
       try {
-        const subcategoriaToUpdate = { ...selectedSubcategoria };
-        await axios.put(`${API_URL}/subcategorias/${selectedSubcategoria.idSubcategoria}`, subcategoriaToUpdate);
-        setShowEditModal(false);
-        setSelectedSubcategoria(null);
-        fetchSubcategorias();
-        toast.success("Subcategoría editada satisfactoriamente");
+        const response = await axios.post(`${API_URL}/subcategorias`, {
+          nombre: newSubcategoria.nombre,
+          categorias: [selectedCategoria],
+        });
+        setSubcategorias([...subcategorias, response.data]);
+        setShowAddSubcategoriaModal(false);
+        setNewSubcategoria({ nombre: "" });
+        toast.success("Subcategoría añadida satisfactoriamente");
       } catch (error) {
-        console.error("Error al editar la subcategoría:", error);
-        toast.error("No se pudo editar la subcategoría");
+        console.error("Error al añadir la subcategoría:", error);
+        toast.error("No se pudo añadir la subcategoría");
       }
     }
   };
 
-  const handleDeleteSubcategoria = async (id: string) => {
-    try {
-      await axios.delete(`${API_URL}/subcategorias/${id}`);
-      fetchSubcategorias();
-      toast.success("Subcategoría eliminada satisfactoriamente");
-    } catch (error) {
-      console.error("Error al eliminar la subcategoría:", error);
-      toast.error("No se pudo eliminar la subcategoría");
-    }
-  };
+  const renderCategoriaActions = (categoria: Categoria) => (
+    <div className="flex space-x-2">
+      <Button size="sm" onClick={() => handleSubcategoriasClick(categoria)}>
+        Subcategorias
+      </Button>
+      <Button size="sm" onClick={() => {/* Edit categoria */}}>
+        Editar
+      </Button>
+      <Button size="sm" onClick={() => {/* Delete categoria */}}>
+        Eliminar
+      </Button>
+    </div>
+  );
 
-  const renderActions = (subcategoria: Subcategoria) => (
-    <Dropdown>
-      <DropdownTrigger>
-        <Button isIconOnly size="sm" className="button-primary">
-          ⋮
-        </Button>
-      </DropdownTrigger>
-      <DropdownMenu
-        onAction={(key) => {
-          if (key === "edit") {
-            setSelectedSubcategoria(subcategoria);
-            setShowEditModal(true);
-          } else if (key === "delete") {
-            if (window.confirm("¿Estás seguro de eliminar esta subcategoría?")) {
-              if (subcategoria.idSubcategoria) {
-                handleDeleteSubcategoria(subcategoria.idSubcategoria);
-              }
-            }
-          }
-        }}
-      >
-        <DropdownItem key="edit">Editar</DropdownItem>
-        <DropdownItem key="delete">Eliminar</DropdownItem>
-      </DropdownMenu>
-    </Dropdown>
+  const renderSubcategoriaActions = (subcategoria: Subcategoria) => (
+    <div className="flex space-x-2">
+      <Button size="sm" onClick={() => {/* Edit subcategoria */}}>
+        Editar
+      </Button>
+      <Button size="sm" onClick={() => {/* Delete subcategoria */}}>
+        Eliminar
+      </Button>
+    </div>
   );
 
   return (
     <div className="p-6 bg-blue-50 min-h-screen">
       <div className="flex items-center justify-between mb-6">
-        <Button className="button-secondary" onClick={() => navigate("/categorias")}>
-          ← Volver a Categorías
-        </Button>
-        <h1 className="text-3xl font-bold text-blue-700">Gestión de Subcategorías para {nombreCategoria}</h1>
-        <Button className="button-primary" onClick={() => setShowAddModal(true)}>
-          Añadir Subcategoría
-        </Button>
+        <Button onClick={() => navigate("/books")}>← Volver a Libros</Button>
+        <h1 className="text-3xl font-bold text-blue-700">Gestión de Categorías y Subcategorías</h1>
+        <Button onClick={() => setShowAddCategoriaModal(true)}>Añadir Categoría</Button>
       </div>
 
-      <Table aria-label="Lista de subcategorías">
+      <Table>
         <TableHeader>
-          <TableColumn className="table-header">Nombre</TableColumn>
-          <TableColumn className="table-header">Acciones</TableColumn>
+          <TableColumn>Nombre</TableColumn>
+          <TableColumn>Acciones</TableColumn>
         </TableHeader>
         <TableBody>
-          {subcategorias.map((subcategoria) => (
-            <TableRow key={subcategoria.idSubcategoria} className="table-row">
-              <TableCell>{subcategoria.nombre}</TableCell>
-              <TableCell>{renderActions(subcategoria)}</TableCell>
+          {categorias.map((categoria) => (
+            <TableRow key={categoria.idCategoria}>
+              <TableCell>{categoria.nombre}</TableCell>
+              <TableCell>{renderCategoriaActions(categoria)}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
 
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar
-        newestOnTop
-        closeOnClick
-        pauseOnHover
-        draggable
-      />
-
-      {/* Add Subcategoria Modal */}
-      <Modal isOpen={showAddModal} onOpenChange={setShowAddModal}>
+      {/* Add Categoria Modal */}
+      <Modal isOpen={showAddCategoriaModal} onOpenChange={setShowAddCategoriaModal}>
         <ModalContent>
           <ModalHeader>
-            <h2>Añadir Nueva Subcategoría</h2>
+            <h2>Añadir Nueva Categoría</h2>
+          </ModalHeader>
+          <ModalBody>
+            <Input
+              label="Nombre"
+              value={newCategoria.nombre}
+              onChange={(e) => setNewCategoria({ nombre: e.target.value })}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={handleAddCategoria}>Confirmar</Button>
+            <Button onClick={() => setShowAddCategoriaModal(false)}>Cancelar</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Subcategorias Modal */}
+      {selectedCategoria && (
+        <Modal isOpen={showSubcategoriasModal} onOpenChange={setShowSubcategoriasModal}>
+          <ModalContent>
+            <ModalHeader>
+              <div className="flex justify-between">
+                <h2>Subcategorías de {selectedCategoria.nombre}</h2>
+                <Button size="sm" onClick={() => setShowAddSubcategoriaModal(true)}>
+                  Añadir Subcategoría
+                </Button>
+              </div>
+            </ModalHeader>
+            <ModalBody>
+              <Table>
+                <TableHeader>
+                  <TableColumn>Nombre</TableColumn>
+                  <TableColumn>Acciones</TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {subcategorias.map((subcategoria) => (
+                    <TableRow key={subcategoria.idSubcategoria}>
+                      <TableCell>{subcategoria.nombre}</TableCell>
+                      <TableCell>{renderSubcategoriaActions(subcategoria)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </ModalBody>
+            <ModalFooter>
+              <Button onClick={() => setShowSubcategoriasModal(false)}>Cerrar</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+
+      {/* Add Subcategoria Modal */}
+      <Modal isOpen={showAddSubcategoriaModal} onOpenChange={setShowAddSubcategoriaModal}>
+        <ModalContent>
+          <ModalHeader>
+            <h2>Añadir Subcategoría a {selectedCategoria?.nombre}</h2>
           </ModalHeader>
           <ModalBody>
             <Input
               label="Nombre"
               value={newSubcategoria.nombre}
-              onChange={(e) => setNewSubcategoria({ ...newSubcategoria, nombre: e.target.value })}
+              onChange={(e) => setNewSubcategoria({ nombre: e.target.value })}
             />
           </ModalBody>
           <ModalFooter>
-            <Button className="button-primary" onClick={handleAddSubcategoria}>
-              Confirmar
-            </Button>
-            <Button className="button-secondary" onClick={() => setShowAddModal(false)}>
-              Cancelar
-            </Button>
+            <Button onClick={handleAddSubcategoria}>Confirmar</Button>
+            <Button onClick={() => setShowAddSubcategoriaModal(false)}>Cancelar</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
 
-      {/* Edit Subcategoria Modal */}
-      {selectedSubcategoria && (
-        <Modal isOpen={showEditModal} onOpenChange={setShowEditModal}>
-          <ModalContent>
-            <ModalHeader>
-              <h2>Editar Subcategoría</h2>
-            </ModalHeader>
-            <ModalBody>
-              <Input
-                label="Nombre"
-                value={selectedSubcategoria.nombre}
-                onChange={(e) => setSelectedSubcategoria({ ...selectedSubcategoria, nombre: e.target.value })}
-              />
-            </ModalBody>
-            <ModalFooter>
-              <Button className="button-primary" onClick={handleSaveEdit}>
-                Confirmar
-              </Button>
-              <Button className="button-secondary" onClick={() => setShowEditModal(false)}>
-                Cancelar
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      )}
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
     </div>
   );
 };
