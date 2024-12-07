@@ -7,7 +7,7 @@
 		"build": "remix vite:build",
 		"check": "biome check . && tsc",
 		"dev": "remix vite:dev",
-		"format": "biome format --write .",
+		"format": "biome format --organize-imports-enabled=true --write .",
 		"start": "remix-serve ./build/server/index.js",
 		"typecheck": "tsc",
 		"prepare": "husky"
