@@ -16,9 +16,7 @@ import {
 	TableRow,
 } from '@nextui-org/react';
 import { useAxios } from '@shared/hooks/axios';
-
-import logo from '@shared/assets/logo.png';
-import styles from './fines.module.css';
+import NavBarAdmin from 'app/components/navbar/navbarAdmin';
 // Fines DTO
 interface FineDTO {
 	fineId: string;
@@ -325,25 +323,8 @@ const MainContent = () => {
 
 const Header = () => {
 	return (
-		<header className={styles.header}>
-			<div className={styles.headerWrapper}>
-				<div className={styles.titleWrapper}>
-					<img
-						src={logo}
-						alt='Bibliosoft Colsabi'
-						className={styles.headerImage}
-					/>
-					<h1 className={styles.headerTitle}>Bibliosoft Colsabi</h1>
-				</div>
-				<div className={styles.headerButtonsContainer}>
-					<Button color='default' size='sm'>
-						Contáctenos
-					</Button>
-					<Button color='default' size='sm'>
-						Iniciar Sesión
-					</Button>
-				</div>
-			</div>
+		<header>
+			<NavBarAdmin />
 		</header>
 	);
 };
