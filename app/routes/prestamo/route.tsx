@@ -10,11 +10,11 @@ import {
 	SelectItem,
 	useDisclosure,
 } from '@nextui-org/react';
+import { type ChangeEvent, useState } from 'react';
 import crearpPrestamo from './assets/crear-prestamo.png';
 import devolverPrestamo from './assets/devolver-prestamo.png';
 import listarPrestamo from './assets/listar-prestamos.png';
 import styles from './prestamo.module.css';
-import { useState } from 'react';
 
 /**
  * Title component renders a heading with a specific style.
@@ -263,7 +263,7 @@ const ReturnPrestamo = () => {
 	 * @returns {void}
 	 */
 	const handleConfirmar = () => {
-		if (libro === null || isNaN(libro)) {
+		if (libro === null || Number.isNaN(libro)) {
 			setErrorMessage('Por favor, ingresa un ID de libro válido.');
 			return;
 		}
@@ -282,10 +282,10 @@ const ReturnPrestamo = () => {
 	 *
 	 * @param {React.ChangeEvent<HTMLInputElement>} e - The change event from the input element.
 	 */
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		const numberValue = Number(value);
-		if (!isNaN(numberValue)) {
+		if (!Number.isNaN(numberValue)) {
 			setLibro(numberValue);
 			setErrorMessage(null);
 		} else {
@@ -326,8 +326,8 @@ const ReturnPrestamo = () => {
 								label='Id del libro'
 								placeholder='Escribe el código aquí'
 								className='mb-4'
-								isRequired
-								isClearable
+								isRequired={true}
+								isClearable={true}
 								description='Escanea el código de barras o el código QR del libro que deseas devolver.'
 								errorMessage={errorMessage}
 								isInvalid={!!errorMessage}
@@ -350,7 +350,9 @@ const ReturnPrestamo = () => {
 							<Button
 								color='primary'
 								onClick={handleConfirmar}
-								isDisabled={libro === null || isNaN(libro)}
+								isDisabled={
+									libro === null || Number.isNaN(libro)
+								}
 							>
 								Confirmar
 							</Button>

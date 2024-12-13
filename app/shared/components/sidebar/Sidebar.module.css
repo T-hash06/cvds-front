@@ -1,0 +1,23 @@
+.sidebar {
+	@apply bg-gray-200 w-64 h-screen shadow-lg flex flex-col items-center py-8 gap-8;
+
+	.headerWrapper {
+		@apply flex flex-col gap-6 items-center;
+
+		.sidebarLogo {
+			@apply w-44 mt-14;
+		}
+
+		.sidebarTitle {
+			@apply text-2xl font-bold text-gray-800;
+		}
+	}
+
+	.sidebarList {
+		@apply max-w-2xl text-lg space-y-20 text-base transition-colors;
+
+		.sidebarItem {
+			@apply flex items-center w-full text-gray-700 hover:text-primary transition-colors;
+		}
+	}
+}
