@@ -13,11 +13,13 @@ import {
 import { useNavigate } from '@remix-run/react';
 import { Bell, LogOut, User as UserLogo } from 'lucide-react';
 import type React from 'react';
+
 // DTO Notificaciones navbar
 type Notification = {
 	id: string;
 	message: string;
 };
+
 const NotificationService = (): Notification[] => {
 	// Aquí va la lógica de obtener notificaciones del API
 	const mockNotifications: Notification[] = [

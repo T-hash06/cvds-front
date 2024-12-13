@@ -16,7 +16,7 @@ import {
 	TableRow,
 } from '@nextui-org/react';
 import { useAxios } from '@shared/hooks/axios';
-import NavBarAdmin from 'app/components/navbar/navbarAdmin';
+import MainLayout from '../../components/layouts/MainLayout';
 // Fines DTO
 interface FineDTO {
 	fineId: string;
@@ -321,20 +321,12 @@ const MainContent = () => {
 	);
 };
 
-const Header = () => {
-	return (
-		<header>
-			<NavBarAdmin />
-		</header>
-	);
-};
 const AdminFinesRoute = () => {
 	const _axios = useAxios();
 	return (
-		<main>
-			<Header />
+		<MainLayout>
 			<MainContent />
-		</main>
+		</MainLayout>
 	);
 };
 export default AdminFinesRoute;

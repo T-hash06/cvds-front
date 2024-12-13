@@ -14,8 +14,7 @@ import {
 	TableRow,
 	Tabs,
 } from '@nextui-org/react';
-import { useAxios } from '@shared/hooks/axios';
-import AppNavbar from 'app/components/navbar/navbarUser';
+import MainLayout from 'app/components/layouts/MainLayout';
 // Fines DTO
 interface FineDTO {
 	fineId: string;
@@ -398,20 +397,11 @@ const MainContent = () => {
 	);
 };
 
-const Header = () => {
-	return (
-		<header>
-			<AppNavbar />
-		</header>
-	);
-};
 const UserNotificationRoute = () => {
-	const _axios = useAxios();
 	return (
-		<main>
-			<Header />
+		<MainLayout>
 			<MainContent />
-		</main>
+		</MainLayout>
 	);
 };
 export default UserNotificationRoute;
