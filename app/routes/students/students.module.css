@@ -1,0 +1,82 @@
+.studentsPage {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 2rem;
+	min-height: 100vh;
+	background-color: #f9fafb;
+}
+
+.title {
+	font-size: 2rem;
+	font-weight: bold;
+	color: #1f2937;
+	margin-bottom: 2rem;
+	text-align: center;
+}
+
+.studentsModules {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 2rem;
+	width: 100%;
+	max-width: 1000px;
+	padding: 1rem;
+}
+
+.studentCard {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 1.5rem;
+	background: white;
+	border-radius: 1rem;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	transition: transform 0.2s;
+	width: 250px; /* Ancho fijo para todas las tarjetas */
+}
+
+.studentCard:hover {
+	transform: translateY(-4px);
+}
+
+.studentIcon {
+	width: 120px;
+	height: 120px;
+	margin-bottom: 1rem;
+	object-fit: contain;
+}
+
+.studentCardTitle {
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: #4b5563;
+	text-align: center;
+	margin: 0;
+}
+
+.studentButtonLink {
+	text-decoration: none;
+	color: inherit;
+}
+
+/* Ajuste para 2 filas de 3 y 2 elementos */
+@media (max-width: 840px) {
+	.studentsModules {
+		max-width: 600px;
+	}
+}
+
+/* Ajuste para vista móvil */
+@media (max-width: 540px) {
+	.studentsModules {
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.studentCard {
+		width: 100%;
+		max-width: 300px;
+	}
+}
