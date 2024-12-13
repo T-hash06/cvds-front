@@ -1,5 +1,5 @@
 packages/*/package-lock.json
-
+package-lock.json
 # dependencies
 node_modules/
 
@@ -50,3 +50,5 @@ build/config\.gypi
 
 dist
 .env
+
+/build
