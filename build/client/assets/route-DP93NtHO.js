@@ -1,1 +1,0 @@
-import{j as r}from"./jsx-runtime-DtbKUkqS.js";const t=()=>[{title:"Library Search"},{name:"description",content:"Welcome to your library search!"}];function n(){return r.jsx("h1",{children:"CVDS 2024"})}export{n as default,t as meta};
