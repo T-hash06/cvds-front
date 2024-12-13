@@ -6,6 +6,7 @@ import {
 	ModalContent,
 	ModalFooter,
 	ModalHeader,
+	Pagination,
 	Table,
 	TableBody,
 	TableCell,
@@ -13,16 +14,16 @@ import {
 	TableHeader,
 	TableRow,
 } from '@nextui-org/react';
-import { useNavigate } from '@remix-run/react';
 import axios from 'axios';
-// CategoriasPage.tsx
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = 'http://localhost:8080';
 
 interface Categoria {
-	idCategoria?: string;
+	id?: string;
 	nombre: string;
 }
 
@@ -36,23 +37,25 @@ const CategoriasPage = () => {
 	const navigate = useNavigate();
 
 	const [categorias, setCategorias] = useState<Categoria[]>([]);
-	const [newCategoria, setNewCategoria] = useState<Categoria>({ nombre: '' });
-	const [showAddCategoriaModal, setShowAddCategoriaModal] = useState(false);
-	const [showEditCategoriaModal, setShowEditCategoriaModal] = useState(false);
-	const [editCategoria, setEditCategoria] = useState<Categoria | null>(null);
-	const [showSubcategoriasModal, setShowSubcategoriasModal] = useState(false);
 	const [selectedCategoria, setSelectedCategoria] =
 		useState<Categoria | null>(null);
 	const [subcategorias, setSubcategorias] = useState<Subcategoria[]>([]);
+	const [showSubcategoriasModal, setShowSubcategoriasModal] = useState(false);
+	const [showAddSubcategoriaModal, setShowAddSubcategoriaModal] =
+		useState(false);
+	const [showEditSubcategoriaModal, setShowEditSubcategoriaModal] =
+		useState(false);
+	const [showAddCategoriaModal, setShowAddCategoriaModal] = useState(false);
+	const [showEditCategoriaModal, setShowEditCategoriaModal] = useState(false);
+	const [newCategoria, setNewCategoria] = useState<Categoria>({ nombre: '' });
+	const [editCategoria, setEditCategoria] = useState<Categoria | null>(null);
 	const [newSubcategoria, setNewSubcategoria] = useState<Subcategoria>({
 		nombre: '',
 	});
-	const [showAddSubcategoriaModal, setShowAddSubcategoriaModal] =
-		useState(false);
 	const [editSubcategoria, setEditSubcategoria] =
 		useState<Subcategoria | null>(null);
-	const [showEditSubcategoriaModal, setShowEditSubcategoriaModal] =
-		useState(false);
+	const [page, setPage] = useState(1);
+	const rowsPerPage = 5;
 
 	useEffect(() => {
 		fetchCategorias();
@@ -78,6 +81,7 @@ const CategoriasPage = () => {
 			setCategorias([...categorias, categoria]);
 			setShowAddCategoriaModal(false);
 			setNewCategoria({ nombre: '' });
+			toast.success('Categoría añadida satisfactoriamente');
 		} catch (error) {
 			console.error('Error al agregar categoría:', error);
 			toast.error('No se pudo agregar la categoría');
@@ -85,22 +89,21 @@ const CategoriasPage = () => {
 	};
 
 	const handleEditCategoria = async () => {
-		if (editCategoria?.idCategoria) {
+		if (editCategoria?.id) {
 			try {
 				const response = await axios.put(
-					`${API_URL}/categorias/${editCategoria.idCategoria}`,
+					`${API_URL}/categorias/${editCategoria.id}`,
 					editCategoria,
 				);
 				const updatedCategoria = response.data;
 				setCategorias(
 					categorias.map((cat) =>
-						cat.idCategoria === updatedCategoria.idCategoria
-							? updatedCategoria
-							: cat,
+						cat.id === updatedCategoria.id ? updatedCategoria : cat,
 					),
 				);
 				setShowEditCategoriaModal(false);
 				setEditCategoria(null);
+				toast.success('Categoría editada satisfactoriamente');
 			} catch (error) {
 				console.error('Error al editar categoría:', error);
 				toast.error('No se pudo editar la categoría');
@@ -111,9 +114,8 @@ const CategoriasPage = () => {
 	const handleDeleteCategoria = async (categoriaId: string) => {
 		try {
 			await axios.delete(`${API_URL}/categorias/${categoriaId}`);
-			setCategorias(
-				categorias.filter((cat) => cat.idCategoria !== categoriaId),
-			);
+			setCategorias(categorias.filter((cat) => cat.id !== categoriaId));
+			toast.success('Categoría eliminada satisfactoriamente');
 		} catch (error) {
 			console.error('Error al eliminar categoría:', error);
 			toast.error('No se pudo eliminar la categoría');
@@ -123,7 +125,7 @@ const CategoriasPage = () => {
 	const handleSubcategoriasClick = async (categoria: Categoria) => {
 		try {
 			const response = await axios.get(
-				`${API_URL}/subcategorias/byCategoria/${categoria.idCategoria}`,
+				`${API_URL}/subcategorias/byCategoria/${categoria.id}`,
 			);
 			setSubcategorias(response.data);
 			setSelectedCategoria(categoria);
@@ -149,6 +151,7 @@ const CategoriasPage = () => {
 				setSubcategorias([...subcategorias, subcategoria]);
 				setShowAddSubcategoriaModal(false);
 				setNewSubcategoria({ nombre: '' });
+				toast.success('Subcategoría añadida satisfactoriamente');
 			} catch (error) {
 				console.error('Error al agregar subcategoría:', error);
 				toast.error('No se pudo agregar la subcategoría');
@@ -157,6 +160,7 @@ const CategoriasPage = () => {
 	};
 
 	const handleEditSubcategoria = async () => {
+		console.log('subcategoria', editSubcategoria);
 		if (editSubcategoria?.idSubcategoria) {
 			try {
 				const response = await axios.put(
@@ -174,6 +178,7 @@ const CategoriasPage = () => {
 				);
 				setShowEditSubcategoriaModal(false);
 				setEditSubcategoria(null);
+				toast.success('Subcategoría editada satisfactoriamente');
 			} catch (error) {
 				console.error('Error al editar subcategoría:', error);
 				toast.error('No se pudo editar la subcategoría');
@@ -189,6 +194,7 @@ const CategoriasPage = () => {
 					(sub) => sub.idSubcategoria !== subcategoriaId,
 				),
 			);
+			toast.success('Subcategoría eliminada satisfactoriamente');
 		} catch (error) {
 			console.error('Error al eliminar subcategoría:', error);
 			toast.error('No se pudo eliminar la subcategoría');
@@ -217,7 +223,7 @@ const CategoriasPage = () => {
 				size='sm'
 				color='danger'
 				onClick={() =>
-					handleDeleteCategoria(categoria.idCategoria ?? '')
+					categoria.id && handleDeleteCategoria(categoria.id)
 				}
 			>
 				Eliminar
@@ -250,6 +256,12 @@ const CategoriasPage = () => {
 		</div>
 	);
 
+	// Calculate the subcategories to display based on the current page
+	const paginatedSubcategorias = subcategorias.slice(
+		(page - 1) * rowsPerPage,
+		page * rowsPerPage,
+	);
+
 	return (
 		<div className='p-6 bg-blue-50 min-h-screen'>
 			<div className='flex items-center justify-between mb-6'>
@@ -259,7 +271,6 @@ const CategoriasPage = () => {
 				>
 					← Volver a Libros
 				</Button>
-
 				<h1 className='text-2xl font-bold mb-4'>Categorías</h1>
 				<Button
 					color='primary'
@@ -275,7 +286,7 @@ const CategoriasPage = () => {
 				</TableHeader>
 				<TableBody>
 					{categorias.map((categoria) => (
-						<TableRow key={categoria.idCategoria}>
+						<TableRow key={categoria.id}>
 							<TableCell>{categoria.nombre}</TableCell>
 							<TableCell>
 								{renderCategoriaActions(categoria)}
@@ -384,22 +395,35 @@ const CategoriasPage = () => {
 									<TableColumn>Acciones</TableColumn>
 								</TableHeader>
 								<TableBody>
-									{subcategorias.map((subcategoria) => (
-										<TableRow
-											key={subcategoria.idSubcategoria}
-										>
-											<TableCell>
-												{subcategoria.nombre}
-											</TableCell>
-											<TableCell>
-												{renderSubcategoriaActions(
-													subcategoria,
-												)}
-											</TableCell>
-										</TableRow>
-									))}
+									{paginatedSubcategorias.map(
+										(subcategoria) => (
+											<TableRow
+												key={
+													subcategoria.idSubcategoria
+												}
+											>
+												<TableCell>
+													{subcategoria.nombre}
+												</TableCell>
+												<TableCell>
+													{renderSubcategoriaActions(
+														subcategoria,
+													)}
+												</TableCell>
+											</TableRow>
+										),
+									)}
 								</TableBody>
 							</Table>
+							<div className='flex justify-center mt-4'>
+								<Pagination
+									total={Math.ceil(
+										subcategorias.length / rowsPerPage,
+									)}
+									page={page}
+									onChange={(newPage) => setPage(newPage)}
+								/>
+							</div>
 						</ModalBody>
 						<ModalFooter>
 							<Button
@@ -501,7 +525,7 @@ const CategoriasPage = () => {
 			<ToastContainer
 				position='top-right'
 				autoClose={3000}
-				hideProgressBar={true}
+				hideProgressBar={false}
 			/>
 		</div>
 	);

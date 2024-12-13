@@ -32,16 +32,20 @@ interface Ejemplar {
 	estado: string;
 	disponible: boolean;
 	libro: string;
+	codigoBarras: string;
+	barcodeURL?: string;
 }
 
 let nombreLibro = '';
+
 const EjemplaresPage = () => {
 	const navigate = useNavigate();
-	const libroId = localStorage.getItem('libroId'); // Retrieve libroId from local storage
+	const libroId = localStorage.getItem('libroId');
 	nombreLibro = localStorage.getItem('nombreLibro') ?? '';
+
 	useEffect(() => {
 		if (!libroId) {
-			navigate('/books'); // Redirect to books if libroId is null
+			navigate('/books');
 		}
 	}, [libroId, navigate]);
 
@@ -60,6 +64,7 @@ const EjemplaresPage = () => {
 		estado: '',
 		disponible: false,
 		libro: libroId ?? '',
+		codigoBarras: '',
 	});
 
 	useEffect(() => {
@@ -74,7 +79,30 @@ const EjemplaresPage = () => {
 					params: { page: page - 1, size: rowsPerPage },
 				},
 			);
-			setEjemplares(response.data);
+			const ejemplaresData = response.data;
+
+			// Fetch barcode URLs for each ejemplar
+			const ejemplaresWithBarcode = await Promise.all(
+				ejemplaresData.map(async (ejemplar: Ejemplar) => {
+					let barcodeURL = '';
+					if (ejemplar.codigoBarras) {
+						try {
+							const barcodeResponse = await axios.get(
+								`${API_URL}/blobs/blob-url/${ejemplar.codigoBarras}`,
+							);
+							barcodeURL = barcodeResponse.data;
+						} catch (error) {
+							console.error(
+								`Error fetching barcode for ejemplar ${ejemplar.id}:`,
+								error,
+							);
+						}
+					}
+					return { ...ejemplar, barcodeURL };
+				}),
+			);
+
+			setEjemplares(ejemplaresWithBarcode);
 			setTotalPages(Math.ceil(response.data.length / rowsPerPage));
 			toast.success('Ejemplares cargados satisfactoriamente');
 		} catch (error) {
@@ -109,6 +137,7 @@ const EjemplaresPage = () => {
 				estado: '',
 				disponible: false,
 				libro: libroId || '',
+				codigoBarras: '',
 			});
 			fetchEjemplares();
 			toast.success('Ejemplar añadido satisfactoriamente');
@@ -156,7 +185,24 @@ const EjemplaresPage = () => {
 			const response = await axios.get(
 				`${API_URL}/ejemplares/${searchTerm}`,
 			);
-			setEjemplares([response.data]);
+			const ejemplar = response.data;
+
+			// Fetch barcode URL
+			let barcodeURL = '';
+			if (ejemplar.codigoBarras) {
+				try {
+					const barcodeResponse = await axios.get(
+						`${API_URL}/blobs/blob-url/${ejemplar.codigoBarras}`,
+					);
+					barcodeURL = barcodeResponse.data;
+				} catch (error) {
+					console.error(
+						`Error fetching barcode for ejemplar ${ejemplar.id}:`,
+						error,
+					);
+				}
+			}
+			setEjemplares([{ ...ejemplar, barcodeURL }]);
 			toast.success('Ejemplar encontrado');
 		} catch (error) {
 			console.error('Error al escanear el ejemplar:', error);
@@ -244,6 +290,9 @@ const EjemplaresPage = () => {
 						Disponible
 					</TableColumn>
 					<TableColumn className='table-header'>Acciones</TableColumn>
+					<TableColumn className='table-header'>
+						Código de Barras
+					</TableColumn>
 				</TableHeader>
 				<TableBody>
 					{ejemplares.map((ejemplar) => (
@@ -256,6 +305,24 @@ const EjemplaresPage = () => {
 								/>
 							</TableCell>
 							<TableCell>{renderActions(ejemplar)}</TableCell>
+							<TableCell>
+								{ejemplar.barcodeURL ? (
+									<a
+										href={ejemplar.barcodeURL}
+										target='_blank'
+										rel='noopener noreferrer'
+									>
+										<img
+											src={ejemplar.barcodeURL}
+											alt='Código de Barras'
+											width='400'
+											height='300'
+										/>
+									</a>
+								) : (
+									'No disponible'
+								)}
+							</TableCell>
 						</TableRow>
 					))}
 				</TableBody>
@@ -265,7 +332,10 @@ const EjemplaresPage = () => {
 				<Pagination
 					total={totalPages}
 					page={page}
-					onChange={(newPage) => setPage(newPage)}
+					onChange={(newPage) => {
+						setPage(newPage);
+						fetchEjemplares();
+					}}
 				/>
 			</div>
 

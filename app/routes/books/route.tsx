@@ -1,8 +1,6 @@
-// app/routes/books/route.tsx
-
 import { useNavigate } from '@remix-run/react';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {
@@ -27,6 +25,18 @@ import {
 } from '@nextui-org/react';
 
 const API_URL = 'http://localhost:8080';
+
+// Check if running in the browser
+if (typeof window !== 'undefined') {
+	localStorage.setItem(
+		'token',
+		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImVjaSIsInJvbGUiOiJzdHVkZW50IiwiaWQiOiJhODA2YTNmNy01MDE2LTQ5YzAtOTE4Yy03M2YyMDc3MmEyZjIiLCJpYXQiOjE3MzQxMDE2MjgsImV4cCI6MTczNDE4ODAyOH0.zG9gaySV6WYexx6Hc3bMjdpca1gn5BiIGxaUTQZ_IH4',
+	);
+	const token = localStorage.getItem('token');
+	if (token) {
+		// axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+	}
+}
 
 interface Libro {
 	id?: string;
@@ -62,15 +72,7 @@ const BooksPage = () => {
 
 	const navigate = useNavigate();
 
-	useEffect(() => {
-		if (searchTerm) {
-			searchLibros();
-		} else {
-			fetchLibros();
-		}
-	}, [searchTerm]);
-
-	const fetchLibros = async () => {
+	const fetchLibros = useCallback(async () => {
 		try {
 			const response = await axios.get(`${API_URL}/libros`, {
 				params: { page: page - 1, size: rowsPerPage },
@@ -82,9 +84,9 @@ const BooksPage = () => {
 			console.error('Error al obtener libros:', error);
 			toast.error('No se pudo cargar los libros');
 		}
-	};
+	}, [page, rowsPerPage]);
 
-	const searchLibros = async () => {
+	const searchLibros = useCallback(async () => {
 		try {
 			const response = await axios.get(
 				`${API_URL}/busquedas/${searchTerm}/parametro/${searchBy}/pagina/${
@@ -98,7 +100,15 @@ const BooksPage = () => {
 			console.error('Error al buscar libros:', error);
 			toast.error('No se pudo realizar la búsqueda');
 		}
-	};
+	}, [searchTerm, searchBy, page, rowsPerPage]);
+
+	useEffect(() => {
+		if (searchTerm) {
+			searchLibros();
+		} else {
+			fetchLibros();
+		}
+	}, [searchTerm, fetchLibros, searchLibros]);
 
 	const resetFilters = () => {
 		setSearchTerm('');
@@ -252,6 +262,14 @@ const BooksPage = () => {
 				<h1 className='text-3xl font-bold text-blue-700'>
 					Gestión de Libros
 				</h1>
+
+				<Button
+					className='button-primary'
+					onClick={() => navigate('/categorias')}
+				>
+					Categorias
+				</Button>
+
 				<Button
 					className='button-primary'
 					onClick={() => setShowAddModal(true)}
