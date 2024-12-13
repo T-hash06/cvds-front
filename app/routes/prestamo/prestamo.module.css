@@ -1,0 +1,27 @@
+.prestamoPage {
+	@apply flex flex-col items-center justify-center h-full space-y-4 border-gray-200 border-2 rounded-lg;
+
+	.title {
+		@apply text-4xl font-light text-center;
+	}
+
+	.prestamoModules {
+		@apply grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl;
+	}
+
+	.prestamoCard {
+		@apply flex flex-col items-center p-6 border-2 border-gray-200 rounded-lg bg-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all;
+	}
+
+	.prestamoIcon {
+		@apply w-16 h-16 mb-4;
+	}
+
+	.prestamoCardTitle {
+		@apply text-xl font-semibold text-gray-700;
+	}
+
+	.prestamoButton {
+		@apply mt-4 px-4 py-2 bg-blue-500 text-white font-medium rounded hover:bg-blue-600 transition-colors;
+	}
+}
