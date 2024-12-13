@@ -1,4 +1,7 @@
+import { useNavigate } from '@remix-run/react';
+
 import axios from 'axios';
+import cookies from 'js-cookie';
 import React from 'react';
 
 /**
@@ -21,6 +24,7 @@ const AxiosContext = React.createContext<ReturnType<
  * The Axios instance is configured with the following settings:
  * - `baseURL`: The base URL for the API, which is retrieved from the environment variable `VITE_API_GATEWAY_URL`.
  * - `timeout`: The request timeout set to 2000 milliseconds.
+ * - `interceptors`: An interceptor that adds the `Authorization` header to the request if a token is present in the cookies.
  *
  * @example
  * ```typescript
@@ -35,10 +39,40 @@ const AxiosContext = React.createContext<ReturnType<
  * ```
  */
 function axiosInstance() {
+	const navigate = useNavigate();
+
 	const instance = axios.create({
 		baseURL: import.meta.env.VITE_API_GATEWAY_URL,
 		timeout: 2000,
 	});
+
+	instance.interceptors.request.use((config) => {
+		const token = cookies.get('$$id');
+
+		if (token) {
+			config.headers.Authorization = `Bearer ${token}`;
+		}
+
+		return config;
+	});
+
+	instance.interceptors.response.use(
+		(response) => {
+			if (response.data?.data) {
+				response.data = response.data.data;
+			}
+
+			return response;
+		},
+		(error) => {
+			if (error.response?.status === 401) {
+				cookies.remove('$$id');
+				navigate('/auth/login');
+			}
+
+			return Promise.reject(error);
+		},
+	);
 
 	return instance;
 }
