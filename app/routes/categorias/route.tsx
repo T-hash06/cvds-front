@@ -18,10 +18,11 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from "@remix-run/react";
+import { useNavigate } from '@remix-run/react';
 import MainLayout from '../../components/layouts/MainLayout';
 
-const API_URL = 'https://backbibliosoft-hefxcthhhadjgxb0.canadacentral-01.azurewebsites.net';
+const API_URL =
+	'https://backbibliosoft-hefxcthhhadjgxb0.canadacentral-01.azurewebsites.net';
 
 interface Categoria {
 	id?: string;
@@ -265,272 +266,283 @@ const CategoriasPage = () => {
 
 	return (
 		<MainLayout>
-		<div className='p-6 bg-blue-50 min-h-screen'>
-			<div className='flex items-center justify-between mb-6'>
-				<Button
-					className='button-secondary'
-					onClick={() => navigate('/books')}
-				>
-					← Volver a Libros
-				</Button>
-				<h1 className='text-2xl font-bold mb-4'>Categorías</h1>
-				<Button
-					color='primary'
-					onClick={() => setShowAddCategoriaModal(true)}
-				>
-					Agregar Categoría
-				</Button>
-			</div>
-			<Table aria-label='Tabla de Categorías' className='mt-4'>
-				<TableHeader>
-					<TableColumn>Categoría</TableColumn>
-					<TableColumn>Acciones</TableColumn>
-				</TableHeader>
-				<TableBody>
-					{categorias.map((categoria) => (
-						<TableRow key={categoria.id}>
-							<TableCell>{categoria.nombre}</TableCell>
-							<TableCell>
-								{renderCategoriaActions(categoria)}
-							</TableCell>
-						</TableRow>
-					))}
-				</TableBody>
-			</Table>
+			<div className='p-6 bg-blue-50 min-h-screen'>
+				<div className='flex items-center justify-between mb-6'>
+					<Button
+						className='button-secondary'
+						onClick={() => navigate('/books')}
+					>
+						← Volver a Libros
+					</Button>
+					<h1 className='text-2xl font-bold mb-4'>Categorías</h1>
+					<Button
+						color='primary'
+						onClick={() => setShowAddCategoriaModal(true)}
+					>
+						Agregar Categoría
+					</Button>
+				</div>
+				<Table aria-label='Tabla de Categorías' className='mt-4'>
+					<TableHeader>
+						<TableColumn>Categoría</TableColumn>
+						<TableColumn>Acciones</TableColumn>
+					</TableHeader>
+					<TableBody>
+						{categorias.map((categoria) => (
+							<TableRow key={categoria.id}>
+								<TableCell>{categoria.nombre}</TableCell>
+								<TableCell>
+									{renderCategoriaActions(categoria)}
+								</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
 
-			{/* Modal para agregar categoría */}
-			<Modal
-				isOpen={showAddCategoriaModal}
-				onOpenChange={setShowAddCategoriaModal}
-				placement='center'
-			>
-				<ModalContent>
-					<ModalHeader>
-						<h2>Agregar Categoría</h2>
-					</ModalHeader>
-					<ModalBody>
-						<Input
-							label='Nombre de la Categoría'
-							value={newCategoria.nombre}
-							onChange={(e) =>
-								setNewCategoria({ nombre: e.target.value })
-							}
-						/>
-					</ModalBody>
-					<ModalFooter>
-						<Button color='primary' onClick={handleAddCategoria}>
-							Agregar
-						</Button>
-						<Button onClick={() => setShowAddCategoriaModal(false)}>
-							Cancelar
-						</Button>
-					</ModalFooter>
-				</ModalContent>
-			</Modal>
-
-			{/* Modal para editar categoría */}
-			{editCategoria && (
+				{/* Modal para agregar categoría */}
 				<Modal
-					isOpen={showEditCategoriaModal}
-					onOpenChange={setShowEditCategoriaModal}
+					isOpen={showAddCategoriaModal}
+					onOpenChange={setShowAddCategoriaModal}
 					placement='center'
 				>
 					<ModalContent>
 						<ModalHeader>
-							<h2>Editar Categoría</h2>
+							<h2>Agregar Categoría</h2>
 						</ModalHeader>
 						<ModalBody>
 							<Input
 								label='Nombre de la Categoría'
-								value={editCategoria.nombre}
+								value={newCategoria.nombre}
 								onChange={(e) =>
-									setEditCategoria({
-										...editCategoria,
-										nombre: e.target.value,
-									})
+									setNewCategoria({ nombre: e.target.value })
 								}
 							/>
 						</ModalBody>
 						<ModalFooter>
 							<Button
 								color='primary'
-								onClick={handleEditCategoria}
-							>
-								Guardar
-							</Button>
-							<Button
-								onClick={() => setShowEditCategoriaModal(false)}
-							>
-								Cancelar
-							</Button>
-						</ModalFooter>
-					</ModalContent>
-				</Modal>
-			)}
-
-			{/* Modal para subcategorías */}
-			{selectedCategoria && (
-				<Modal
-					isOpen={showSubcategoriasModal}
-					onOpenChange={setShowSubcategoriasModal}
-					placement='center'
-				>
-					<ModalContent>
-						<ModalHeader>
-							<h2>Subcategorías de {selectedCategoria.nombre}</h2>
-						</ModalHeader>
-						<ModalBody>
-							<Button
-								color='primary'
-								onClick={() =>
-									setShowAddSubcategoriaModal(true)
-								}
-							>
-								Agregar Subcategoría
-							</Button>
-							<Table
-								aria-label='Tabla de Subcategorías'
-								className='mt-4'
-							>
-								<TableHeader>
-									<TableColumn>Subcategoría</TableColumn>
-									<TableColumn>Acciones</TableColumn>
-								</TableHeader>
-								<TableBody>
-									{paginatedSubcategorias.map(
-										(subcategoria) => (
-											<TableRow
-												key={
-													subcategoria.idSubcategoria
-												}
-											>
-												<TableCell>
-													{subcategoria.nombre}
-												</TableCell>
-												<TableCell>
-													{renderSubcategoriaActions(
-														subcategoria,
-													)}
-												</TableCell>
-											</TableRow>
-										),
-									)}
-								</TableBody>
-							</Table>
-							<div className='flex justify-center mt-4'>
-								<Pagination
-									total={Math.ceil(
-										subcategorias.length / rowsPerPage,
-									)}
-									page={page}
-									onChange={(newPage) => setPage(newPage)}
-								/>
-							</div>
-						</ModalBody>
-						<ModalFooter>
-							<Button
-								onClick={() => setShowSubcategoriasModal(false)}
-							>
-								Cerrar
-							</Button>
-						</ModalFooter>
-					</ModalContent>
-				</Modal>
-			)}
-
-			{/* Modal para agregar subcategoría */}
-			{selectedCategoria && (
-				<Modal
-					isOpen={showAddSubcategoriaModal}
-					onOpenChange={setShowAddSubcategoriaModal}
-					placement='center'
-				>
-					<ModalContent>
-						<ModalHeader>
-							<h2>
-								Agregar Subcategoría a{' '}
-								{selectedCategoria.nombre}
-							</h2>
-						</ModalHeader>
-						<ModalBody>
-							<Input
-								label='Nombre de la Subcategoría'
-								value={newSubcategoria.nombre}
-								onChange={(e) =>
-									setNewSubcategoria({
-										nombre: e.target.value,
-									})
-								}
-							/>
-						</ModalBody>
-						<ModalFooter>
-							<Button
-								color='primary'
-								onClick={handleAddSubcategoria}
+								onClick={handleAddCategoria}
 							>
 								Agregar
 							</Button>
 							<Button
-								onClick={() =>
-									setShowAddSubcategoriaModal(false)
-								}
+								onClick={() => setShowAddCategoriaModal(false)}
 							>
 								Cancelar
 							</Button>
 						</ModalFooter>
 					</ModalContent>
 				</Modal>
-			)}
 
-			{/* Modal para editar subcategoría */}
-			{editSubcategoria && (
-				<Modal
-					isOpen={showEditSubcategoriaModal}
-					onOpenChange={setShowEditSubcategoriaModal}
-					placement='center'
-				>
-					<ModalContent>
-						<ModalHeader>
-							<h2>Editar Subcategoría</h2>
-						</ModalHeader>
-						<ModalBody>
-							<Input
-								label='Nombre de la Subcategoría'
-								value={editSubcategoria.nombre}
-								onChange={(e) =>
-									setEditSubcategoria({
-										...editSubcategoria,
-										nombre: e.target.value,
-									})
-								}
-							/>
-						</ModalBody>
-						<ModalFooter>
-							<Button
-								color='primary'
-								onClick={handleEditSubcategoria}
-							>
-								Guardar
-							</Button>
-							<Button
-								onClick={() =>
-									setShowEditSubcategoriaModal(false)
-								}
-							>
-								Cancelar
-							</Button>
-						</ModalFooter>
-					</ModalContent>
-				</Modal>
-			)}
+				{/* Modal para editar categoría */}
+				{editCategoria && (
+					<Modal
+						isOpen={showEditCategoriaModal}
+						onOpenChange={setShowEditCategoriaModal}
+						placement='center'
+					>
+						<ModalContent>
+							<ModalHeader>
+								<h2>Editar Categoría</h2>
+							</ModalHeader>
+							<ModalBody>
+								<Input
+									label='Nombre de la Categoría'
+									value={editCategoria.nombre}
+									onChange={(e) =>
+										setEditCategoria({
+											...editCategoria,
+											nombre: e.target.value,
+										})
+									}
+								/>
+							</ModalBody>
+							<ModalFooter>
+								<Button
+									color='primary'
+									onClick={handleEditCategoria}
+								>
+									Guardar
+								</Button>
+								<Button
+									onClick={() =>
+										setShowEditCategoriaModal(false)
+									}
+								>
+									Cancelar
+								</Button>
+							</ModalFooter>
+						</ModalContent>
+					</Modal>
+				)}
 
-			<ToastContainer
-				position='top-right'
-				autoClose={3000}
-				hideProgressBar={false}
-			/>
-		</div>
-	</MainLayout>
+				{/* Modal para subcategorías */}
+				{selectedCategoria && (
+					<Modal
+						isOpen={showSubcategoriasModal}
+						onOpenChange={setShowSubcategoriasModal}
+						placement='center'
+					>
+						<ModalContent>
+							<ModalHeader>
+								<h2>
+									Subcategorías de {selectedCategoria.nombre}
+								</h2>
+							</ModalHeader>
+							<ModalBody>
+								<Button
+									color='primary'
+									onClick={() =>
+										setShowAddSubcategoriaModal(true)
+									}
+								>
+									Agregar Subcategoría
+								</Button>
+								<Table
+									aria-label='Tabla de Subcategorías'
+									className='mt-4'
+								>
+									<TableHeader>
+										<TableColumn>Subcategoría</TableColumn>
+										<TableColumn>Acciones</TableColumn>
+									</TableHeader>
+									<TableBody>
+										{paginatedSubcategorias.map(
+											(subcategoria) => (
+												<TableRow
+													key={
+														subcategoria.idSubcategoria
+													}
+												>
+													<TableCell>
+														{subcategoria.nombre}
+													</TableCell>
+													<TableCell>
+														{renderSubcategoriaActions(
+															subcategoria,
+														)}
+													</TableCell>
+												</TableRow>
+											),
+										)}
+									</TableBody>
+								</Table>
+								<div className='flex justify-center mt-4'>
+									<Pagination
+										total={Math.ceil(
+											subcategorias.length / rowsPerPage,
+										)}
+										page={page}
+										onChange={(newPage) => setPage(newPage)}
+									/>
+								</div>
+							</ModalBody>
+							<ModalFooter>
+								<Button
+									onClick={() =>
+										setShowSubcategoriasModal(false)
+									}
+								>
+									Cerrar
+								</Button>
+							</ModalFooter>
+						</ModalContent>
+					</Modal>
+				)}
+
+				{/* Modal para agregar subcategoría */}
+				{selectedCategoria && (
+					<Modal
+						isOpen={showAddSubcategoriaModal}
+						onOpenChange={setShowAddSubcategoriaModal}
+						placement='center'
+					>
+						<ModalContent>
+							<ModalHeader>
+								<h2>
+									Agregar Subcategoría a{' '}
+									{selectedCategoria.nombre}
+								</h2>
+							</ModalHeader>
+							<ModalBody>
+								<Input
+									label='Nombre de la Subcategoría'
+									value={newSubcategoria.nombre}
+									onChange={(e) =>
+										setNewSubcategoria({
+											nombre: e.target.value,
+										})
+									}
+								/>
+							</ModalBody>
+							<ModalFooter>
+								<Button
+									color='primary'
+									onClick={handleAddSubcategoria}
+								>
+									Agregar
+								</Button>
+								<Button
+									onClick={() =>
+										setShowAddSubcategoriaModal(false)
+									}
+								>
+									Cancelar
+								</Button>
+							</ModalFooter>
+						</ModalContent>
+					</Modal>
+				)}
+
+				{/* Modal para editar subcategoría */}
+				{editSubcategoria && (
+					<Modal
+						isOpen={showEditSubcategoriaModal}
+						onOpenChange={setShowEditSubcategoriaModal}
+						placement='center'
+					>
+						<ModalContent>
+							<ModalHeader>
+								<h2>Editar Subcategoría</h2>
+							</ModalHeader>
+							<ModalBody>
+								<Input
+									label='Nombre de la Subcategoría'
+									value={editSubcategoria.nombre}
+									onChange={(e) =>
+										setEditSubcategoria({
+											...editSubcategoria,
+											nombre: e.target.value,
+										})
+									}
+								/>
+							</ModalBody>
+							<ModalFooter>
+								<Button
+									color='primary'
+									onClick={handleEditSubcategoria}
+								>
+									Guardar
+								</Button>
+								<Button
+									onClick={() =>
+										setShowEditSubcategoriaModal(false)
+									}
+								>
+									Cancelar
+								</Button>
+							</ModalFooter>
+						</ModalContent>
+					</Modal>
+				)}
+
+				<ToastContainer
+					position='top-right'
+					autoClose={3000}
+					hideProgressBar={false}
+				/>
+			</div>
+		</MainLayout>
 	);
 };
 
