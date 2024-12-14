@@ -29,13 +29,21 @@ const typesDocument = [
 ];
 
 const grades = [
-	{ label: '1', key: '1' },
-	{ label: '2', key: '2' },
-	{ label: '3', key: '3' },
-	{ label: '4', key: '4' },
-	{ label: '5', key: '5' },
-	{ label: '6', key: '6' },
-]; // OBTENER DE BACK
+	{ label: 'Pre-Jardin', key: 'Pre-Jardin' },
+	{ label: 'Jardin', key: 'Jardin' },
+	{ label: 'Transicion', key: 'Transicion' },
+	{ label: 'Primero', key: '1°' },
+	{ label: 'Segundo', key: '2°' },
+	{ label: 'Tercero', key: '3°' },
+	{ label: 'Cuarto', key: '4°' },
+	{ label: 'Quinto', key: '5°' },
+	{ label: 'Sexto', key: '6°' },
+	{ label: 'Septimo', key: '7°' },
+	{ label: 'Octavo', key: '8°' },
+	{ label: 'Noveno', key: '9°' },
+	{ label: 'Decimo', key: '10°' },
+	{ label: 'Undecimo', key: '11°' }
+];
 
 const courses = [
 	{ label: '101', key: '101' },
