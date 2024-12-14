@@ -85,7 +85,7 @@ const ViewStudents = () => {
 
 const ViewGuardians = () => {
 	return (
-		<Link to="/responsible.consult/route" style={{ textDecoration: 'none' }}>
+		<Link to="/responsible-consult" style={{ textDecoration: 'none' }}>
 			<StudentCard
 				image={consultarResponsables}
 				title="Consulta de Responsables"
