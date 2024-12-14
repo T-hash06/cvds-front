@@ -1,4 +1,6 @@
 import {
+	Autocomplete,
+	AutocompleteItem,
 	Button,
 	Input,
 	Modal,
@@ -12,11 +14,13 @@ import {
 } from '@nextui-org/react';
 import MainLayout from 'app/components/layouts/MainLayout';
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import crearpPrestamo from './assets/crear-prestamo.png';
 import devolverPrestamo from './assets/devolver-prestamo.png';
 import listarPrestamo from './assets/listar-prestamos.png';
 import styles from './prestamo.module.css';
+import axiosIntance from '../../shared/hooks/axiosIntance';
+
 
 const Title = () => {
 	return <h1 className={styles.title}>¿Qué Acción Deseas Realizar?</h1>;
@@ -24,72 +28,53 @@ const Title = () => {
 
 const CreatePrestamo = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	const [usuario, setUsuario] = useState<number | null>(null);
-	const [libro, setLibro] = useState<number | null>(null);
-	const [filtroId, setFiltroId] = useState('');
+	const [usuarios, setUsuarios] = useState([]);
+	const [libros, setLibros] = useState([]);
 
-	const usuarios = [
-		{ id: 1, nombre: 'Juan Pérez', email: 'juan.perez@example.com' },
-		{ id: 2, nombre: 'María García', email: 'maria.garcia@example.com' },
-		{
-			id: 3,
-			nombre: 'Carlos Rodríguez',
-			email: 'carlos.rodriguez@example.com',
-		},
-		{ id: 4, nombre: 'Ana Martínez', email: 'ana.martinez@example.com' },
-		{ id: 5, nombre: 'Luis González', email: 'luis.gonzalez@example.com' },
-		{ id: 6, nombre: 'Sofía López', email: 'sofia.lopez@example.com' },
-		{
-			id: 7,
-			nombre: 'Diego Fernández',
-			email: 'diego.fernandez@example.com',
-		},
-	];
+	const fetchBooks = async () => {
+		const response = await axiosIntance.get('/libros');
+		return response.data.content;
+	}
 
-	const libros = [
-		{ id: 1, titulo: 'Cien años de soledad' },
-		{ id: 2, titulo: 'El principito' },
-		{ id: 3, titulo: '1984' },
-		{ id: 4, titulo: 'La sombra del viento' },
-	];
+	const getLibros = async () => {
+		const libros = await fetchBooks();
+		return libros;
+	}
+	
+	const fetchUsers = async () => {
+		const response = await axiosIntance.get('/users/students?pageNumber=1&pageSize=100');
+		return response.data.content;
+	}
 
-	const usuariosFiltrados = usuarios.filter(
-		(usuario) =>
-			filtroId === '' || usuario.id.toString().includes(filtroId),
-	);
+	const getUsuarios = async () => {
+		const usuarios = await fetchUsers();
+		console.log("Usuarios" + usuarios);
+		return usuarios;
+	}
 
-	// aqui es donde se llama a la api para crear un prestamo
-	const handleConfirmar = async () => {
-		if (usuario && libro) {
-			const url =
-				'https://odyv7fszai.execute-api.us-east-1.amazonaws.com/BiblioSoftAPI/prestamos';
-			const loanData = {
-				idEstudiante: usuario,
-				idLibro: libro,
-				fechaPrestamo: new Date().toISOString(),
-				estado: 'Prestado',
-			};
 
-			try {
-				const response = await fetch(url, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify(loanData),
-				});
+	useEffect(() => {
+		const fetchLibros = async () => {
+			const librosData = await getLibros();
+			setLibros(librosData);
+		};
+		const fetchUsuarios = async () => {
+			const usuariosData = await getUsuarios();
+			setUsuarios(usuariosData);
+		};
+		fetchUsuarios();
+		fetchLibros();
+	}, []);
 
-				if (!response.ok) {
-					throw new Error('Network response was not ok');
-				}
-
-				const data = await response.json();
-				console.log('Préstamo realizado:', data);
-				onClose();
-			} catch (error) {
-				console.error('Error realizando el préstamo:', error);
-			}
-		}
+	/**
+	 * Handles the confirmation of a loan.
+	 * Logs the loan details (user and book) to the console and closes the modal.
+	 *
+	 * @function
+	 * @name handleConfirmar
+	 */
+	const handleConfirmar = () => {
+		onClose();
 	};
 
 	return (
@@ -129,61 +114,23 @@ const CreatePrestamo = () => {
 							préstamo.
 						</p>
 
-						<Input
-							type='text'
-							label='Filtrar por ID de Usuario'
-							placeholder='Ingrese ID'
-							value={filtroId}
-							onChange={(e) => setFiltroId(e.target.value)}
+						<Autocomplete
 							className='mb-4'
-						/>
-
-						<Select
-							label='Seleccionar Usuario'
-							placeholder='Buscar usuario'
-							variant='bordered'
-							onSelectionChange={(keys) =>
-								setUsuario(Number(Array.from(keys)[0]))
-							}
-							selectedKeys={usuario ? [usuario.toString()] : []}
-							className='mb-4'
+							defaultItems={usuarios}
+							placeholder='Buscar por ID del estudiante'
+							label='Seleccionar Estudiante'
 						>
-							{usuariosFiltrados.map((user) => (
-								<SelectItem
-									key={user.id}
-									value={user.id}
-									textValue={`${user.nombre} (${user.email})`}
-								>
-									<div className='flex flex-col'>
-										<span className='font-bold'>
-											{user.nombre}
-										</span>
-										<span className='text-gray-500 text-small'>
-											ID: {user.id} | {user.email}
-										</span>
-									</div>
-								</SelectItem>
-							))}
-						</Select>
+							{/* {(item) => <AutocompleteItem key={item.id}>{item.name} ({item.id})</AutocompleteItem>} */}
+						</Autocomplete>
 
-						<Select
+						<Autocomplete
+							className='mb-4'
+							defaultItems={libros}
+							placeholder='Buscar por ID de libro'
 							label='Seleccionar Libro'
-							placeholder='Elige un libro'
-							variant='bordered'
-							onSelectionChange={(keys) =>
-								setLibro(Number(Array.from(keys)[0]))
-							}
-							selectedKeys={libro ? [libro.toString()] : []}
 						>
-							{libros.map((libroItem) => (
-								<SelectItem
-									key={libroItem.id}
-									value={libroItem.id}
-								>
-									{libroItem.titulo}
-								</SelectItem>
-							))}
-						</Select>
+							{(item) => <AutocompleteItem key={item.id}>{item.nombreLibro}</AutocompleteItem>}
+						</Autocomplete>
 					</ModalBody>
 					<ModalFooter>
 						<Button
@@ -196,7 +143,7 @@ const CreatePrestamo = () => {
 						<Button
 							color='primary'
 							onPress={handleConfirmar}
-							isDisabled={!usuario || !libro}
+							//isDisabled={!usuario || !libro}
 						>
 							Confirmar Préstamo
 						</Button>
