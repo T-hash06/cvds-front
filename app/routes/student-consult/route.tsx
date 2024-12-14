@@ -3,11 +3,12 @@ import MainLayout from '../../components/layouts/UsersManagementLayout';
 import styles from './student-consult.module.css';
 
 interface Student {
-    document: string;
-    siteDocument: string;
+    id: string;
     name: string;
-    phoneNumber: string;
-    email: string;
+    document: string;
+    documentType: string;
+    courseName: string;
+    responsibleDocument: string;
 }
 
 const ViewStudents = () => {
@@ -49,16 +50,19 @@ const ViewStudents = () => {
 
         fetchStudents();
     }, [pageNumber, pageSize]);
+
     const handleNextPage = () => {
         if (pageNumber < totalPages) {
             setPageNumber(pageNumber + 1);
         }
     };
+
     const handlePrevPage = () => {
         if (pageNumber > 1) {
             setPageNumber(pageNumber - 1);
         }
     };
+
     return (
         <div className={styles.viewPage}>
             <MainLayout>
@@ -67,9 +71,10 @@ const ViewStudents = () => {
                     <thead>
                     <tr>
                         <th>Nombre</th>
+                        <th>Tipo Documento</th>
                         <th>Documento</th>
-                        <th>Teléfono</th>
-                        <th>Email</th>
+                        <th>Curso</th>
+                        <th>Documento Responsable</th>
                         <th>Actualizar</th>
                         <th>Desactivar</th>
                     </tr>
@@ -78,9 +83,10 @@ const ViewStudents = () => {
                     {students.map((student, index) => (
                         <tr key={index}>
                             <td>{student.name}</td>
+                            <td>{student.documentType}</td>
                             <td>{student.document}</td>
-                            <td>{student.phoneNumber}</td>
-                            <td>{student.email}</td>
+                            <td>{student.courseName}</td>
+                            <td>{student.responsibleDocument}</td>
                             <td>
                                 <button className={styles.updateButton}>Actualizar</button>
                             </td>
