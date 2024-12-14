@@ -1,13 +1,9 @@
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import React from 'react';
-
 import {
 	Button,
 	Card,
 	CardBody,
+	CardFooter,
 	CardHeader,
-	Spacer,
 	Table,
 	TableBody,
 	TableCell,
@@ -15,7 +11,13 @@ import {
 	TableHeader,
 	TableRow,
 } from '@nextui-org/react';
+import { Pagination } from '@nextui-org/react';
 import { useAxios } from '@shared/hooks/axios';
+import axios from 'axios';
+import cookies from 'js-cookie';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import React from 'react';
 import MainLayout from '../../components/layouts/MainLayout';
 // Fines DTO
 interface FineDTO {
@@ -51,7 +53,7 @@ const generatePDF = (fines: FineDTO[]) => {
 		`$${fine.amount}`,
 		fine.fineStatus,
 		fine.fineType,
-		fine.expiredDate.toLocaleDateString(),
+		new Date(fine.expiredDate).toLocaleDateString(),
 	]);
 
 	autoTable(doc, {
@@ -90,217 +92,71 @@ const TableFines: React.FC<TableFineProps> = ({ fines }) => (
 		</TableHeader>
 
 		<TableBody>
-			{fines.map((fine) => (
-				<TableRow key={fine.fineId}>
-					<TableCell>{fine.bookTitle}</TableCell>
-					<TableCell>{fine.description}</TableCell>
-					<TableCell>{`$${fine.amount}`}</TableCell>
-					<TableCell>{fine.fineStatus}</TableCell>
-					<TableCell>{fine.fineType}</TableCell>
-					<TableCell>
-						{fine.expiredDate.toLocaleDateString()}
-					</TableCell>
+			{fines ? (
+				fines.map((fine) => (
+					<TableRow key={fine.fineId}>
+						<TableCell>{fine.bookTitle}</TableCell>
+						<TableCell>{fine.description}</TableCell>
+						<TableCell>{`$${fine.amount}`}</TableCell>
+						<TableCell>{fine.fineStatus}</TableCell>
+						<TableCell>{fine.fineType}</TableCell>
+						<TableCell>
+							{new Date(fine.expiredDate).toLocaleDateString()}
+						</TableCell>
+					</TableRow>
+				))
+			) : (
+				<TableRow>
+					<TableCell>No hay multas</TableCell>
+					<TableCell>No hay multas</TableCell>
+					<TableCell>No hay multas</TableCell>
+					<TableCell>No hay multas</TableCell>
+					<TableCell>No hay multas</TableCell>
+					<TableCell>No hay multas</TableCell>
 				</TableRow>
-			))}
+			)}
 		</TableBody>
 	</Table>
 );
-/**
- * This array represents a Mock of the fines obtained from the API.
- */
-const mockFines: FineDTO[] = [
-	{
-		fineId: 'fine-id-1',
-		description: 'Entrego en mal estado',
-		amount: 8500,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 11, 25),
-		bookTitle: 'Boulevard',
-	},
-	{
-		fineId: 'fine-id-2',
-		description: 'Entrego tarde',
-		amount: 5000.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 11, 30),
-		bookTitle: 'Harry Potter',
-	},
-	{
-		fineId: 'fine-id-3',
-		description: 'Entrego tarde',
-		amount: 2000.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 1),
-		bookTitle: 'El principito',
-	},
-	{
-		fineId: 'fine-id-4',
-		description: 'Entrego en mal estado',
-		amount: 12000.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 5),
-		bookTitle: 'Cien años de soledad',
-	},
-	{
-		fineId: 'fine-id-5',
-		description: 'Entrego tarde',
-		amount: 14500.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 10),
-		bookTitle: 'Don Quijote de la Mancha',
-	},
-	{
-		fineId: 'fine-id-6',
-		description: 'Entrego en mal estado',
-		amount: 15000.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 12),
-		bookTitle: '1984',
-	},
-	{
-		fineId: 'fine-id-7',
-		description: 'Entrego tarde',
-		amount: 11000.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 15),
-		bookTitle: 'Matar a un ruiseñor',
-	},
-	{
-		fineId: 'fine-id-8',
-		description: 'Entrego en mal estado',
-		amount: 7000.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 20),
-		bookTitle: 'Orgullo y prejuicio',
-	},
-	{
-		fineId: 'fine-id-9',
-		description: 'Entrego tarde',
-		amount: 13000.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 22),
-		bookTitle: 'El Gran Gatsby',
-	},
-	{
-		fineId: 'fine-id-10',
-		description: 'Entrego en mal estado',
-		amount: 9500.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 23),
-		bookTitle: 'Crimen y castigo',
-	},
-	{
-		fineId: 'fine-id-11',
-		description: 'Entrego tarde',
-		amount: 10000.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 25),
-		bookTitle: 'Cumbres Borrascosas',
-	},
-	{
-		fineId: 'fine-id-12',
-		description: 'Entrego en mal estado',
-		amount: 7000.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 28),
-		bookTitle: 'La Odisea',
-	},
-	{
-		fineId: 'fine-id-13',
-		description: 'Entrego tarde',
-		amount: 11000.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 30),
-		bookTitle: 'El señor de los anillos',
-	},
-	{
-		fineId: 'fine-id-14',
-		description: 'Entrego en mal estado',
-		amount: 8500.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 6),
-		bookTitle: 'El Hobbit',
-	},
-	{
-		fineId: 'fine-id-15',
-		description: 'Entrego tarde',
-		amount: 12500.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 8),
-		bookTitle: 'Los Miserables',
-	},
-	{
-		fineId: 'fine-id-16',
-		description: 'Entrego en mal estado',
-		amount: 13500.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 10),
-		bookTitle: 'Ana Karenina',
-	},
-	{
-		fineId: 'fine-id-17',
-		description: 'Entrego tarde',
-		amount: 14500.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 12),
-		bookTitle: 'Ulises',
-	},
-	{
-		fineId: 'fine-id-18',
-		description: 'Entrego en mal estado',
-		amount: 10000.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 15),
-		bookTitle: 'El alquimista',
-	},
-	{
-		fineId: 'fine-id-19',
-		description: 'Entrego tarde',
-		amount: 8500.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 17),
-		bookTitle: 'La sombra del viento',
-	},
-	{
-		fineId: 'fine-id-20',
-		description: 'Entrego en mal estado',
-		amount: 12000.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 20),
-		bookTitle: 'El retrato de Dorian Gray',
-	},
-];
 const MainContent = () => {
 	const [fines, setFines] = React.useState<FineDTO[]>([]);
+	const [currentPage, setCurrentPage] = React.useState(1); // Cambiado a 1-indexado
+	const [totalPages, setTotalPages] = React.useState(1);
+	const itemsPerPage = 10;
+
+	const fetchFines = React.useCallback(async (page: number) => {
+		try {
+			const token = cookies.get('$$id');
+			const response = await axios.get(
+				`https://odyv7fszai.execute-api.us-east-1.amazonaws.com/BiblioSoftAPI/notifications/admin/fines-pending?page=${page - 1}&size=${itemsPerPage}`,
+				{
+					headers: {
+						authorization: `Bearer ${token}`,
+						'Content-Type': 'application/json',
+					},
+				},
+			);
+			setFines(response.data.data);
+			setTotalPages(response.data.totalPages);
+		} catch (error) {
+			console.error('Error:', error);
+			setFines([]);
+			setTotalPages(1);
+		}
+	}, []); // Dependencia: itemsPerPage
 
 	React.useEffect(() => {
-		// Simula carga de datos de API
-		setFines(mockFines);
-	}, []);
+		fetchFines(currentPage);
+	}, [fetchFines, currentPage]); // Dependencias: fetchFines y currentPage
+
+	const handlePageChange = (page: number) => {
+		setCurrentPage(page);
+	};
 
 	const generateReport = () => {
-		generatePDF(mockFines);
+		generatePDF(fines);
 	};
+
 	return (
 		<Card className='card-admin-fines'>
 			<CardHeader className='flex justify-center items-center p-4'>
@@ -310,13 +166,19 @@ const MainContent = () => {
 			</CardHeader>
 			<CardBody className='flex flex-col gap-4'>
 				<TableFines fines={fines} />
-				<div className='flex justify-left'>
-					<Button color='default' onClick={generateReport}>
-						Generar Reporte
-					</Button>
-				</div>
-				<Spacer y={2} />
 			</CardBody>
+			<CardFooter className='flex flex-col sm:flex-row justify-center items-center gap-4'>
+				<Button color='default' onClick={generateReport}>
+					Generar Reporte
+				</Button>
+				<Pagination
+					total={totalPages}
+					page={currentPage}
+					onChange={handlePageChange}
+					color='default'
+					className='flex justify-center items-center p-4'
+				/>
+			</CardFooter>
 		</Card>
 	);
 };
