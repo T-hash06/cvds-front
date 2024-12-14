@@ -6,7 +6,6 @@ const sectionsByRole: Record<string, { name: string; path: string }[]> = {
 	admin: [
 		{ name: 'Inicio', path: '/general' },
 		{ name: 'Historial Préstamos', path: '/prestamo' },
-		{ name: 'Historial Devoluciones', path: '/admin/returns' },
 		{ name: 'Gestionar Libros', path: '/books' },
 		{ name: 'Soporte', path: '/admin/support' },
 		{ name: 'Salir', path: '/logout' },
