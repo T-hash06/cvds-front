@@ -1,5 +1,4 @@
 import { useNavigate } from '@remix-run/react';
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -76,7 +75,7 @@ const EjemplaresPage = () => {
 	const fetchEjemplares = async () => {
 		try {
 			const response = await axiosIntance.get(
-				`${API_URL}/ejemplares/libro/${libroId}`,
+				`ejemplares/libro/${libroId}`,
 				{
 					params: { page: page - 1, size: rowsPerPage },
 				},
@@ -90,7 +89,7 @@ const EjemplaresPage = () => {
 					if (ejemplar.codigoBarras) {
 						try {
 							const barcodeResponse = await axiosIntance.get(
-								`${API_URL}/blobs/blob-url/${ejemplar.codigoBarras}`,
+								`blobs/blob-url/${ejemplar.codigoBarras}`,
 							);
 							barcodeURL = barcodeResponse.data;
 						} catch (error) {
@@ -132,7 +131,7 @@ const EjemplaresPage = () => {
 				...newEjemplar,
 				libro: libroId,
 			};
-			await axiosIntance.post(`${API_URL}/ejemplares`, ejemplarToAdd);
+			await axiosIntance.post(`ejemplares`, ejemplarToAdd);
 			setShowAddModal(false);
 			setNewEjemplar({
 				estado: '',
@@ -156,7 +155,7 @@ const EjemplaresPage = () => {
 					libro: libroId,
 				};
 				await axiosIntance.put(
-					`${API_URL}/ejemplares/${selectedEjemplar.id}`,
+					`ejemplares/${selectedEjemplar.id}`,
 					ejemplarToUpdate,
 				);
 				setShowEditModal(false);
@@ -172,7 +171,7 @@ const EjemplaresPage = () => {
 
 	const handleDeleteEjemplar = async (id: string) => {
 		try {
-			await axiosIntance.delete(`${API_URL}/ejemplares/${id}`);
+			await axiosIntance.delete(`ejemplares/${id}`);
 			fetchEjemplares();
 			toast.success('Ejemplar eliminado satisfactoriamente');
 		} catch (error) {
@@ -184,7 +183,7 @@ const EjemplaresPage = () => {
 	const handleScanEjemplar = async () => {
 		try {
 			const response = await axiosIntance.get(
-				`${API_URL}/ejemplares/${searchTerm}`,
+				`ejemplares/${searchTerm}`,
 			);
 			const ejemplar = response.data;
 
@@ -193,7 +192,7 @@ const EjemplaresPage = () => {
 			if (ejemplar.codigoBarras) {
 				try {
 					const barcodeResponse = await axiosIntance.get(
-						`${API_URL}/blobs/blob-url/${ejemplar.codigoBarras}`,
+						`blobs/blob-url/${ejemplar.codigoBarras}`,
 					);
 					barcodeURL = barcodeResponse.data;
 				} catch (error) {

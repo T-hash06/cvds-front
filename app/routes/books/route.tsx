@@ -1,5 +1,4 @@
 import { useNavigate } from '@remix-run/react';
-import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -81,7 +80,7 @@ const BooksPage = () => {
 
 	const fetchLibros = useCallback(async () => {
 		try {
-			const response = await axiosIntance.get(`${API_URL}/libros`, {
+			const response = await axiosIntance.get(`libros`, {
 				params: { page: page - 1, size: rowsPerPage },
 			});
 			setLibros(response.data.content);
@@ -95,7 +94,7 @@ const BooksPage = () => {
 	const searchLibros = useCallback(async () => {
 		try {
 			const response = await axiosIntance.get(
-				`${API_URL}/busquedas/${searchTerm}/parametro/${searchBy}/pagina/${
+				`busquedas/${searchTerm}/parametro/${searchBy}/pagina/${
 					page - 1
 				}/tamano/${rowsPerPage}`,
 			);
@@ -125,7 +124,7 @@ const BooksPage = () => {
 
 	const deleteLibro = async (id: string) => {
 		try {
-			await axiosIntance.delete(`${API_URL}/libros/${id}`);
+			await axiosIntance.delete(`libros/${id}`);
 			if (searchTerm) {
 				searchLibros();
 			} else {
@@ -153,7 +152,7 @@ const BooksPage = () => {
 		if (selectedLibro) {
 			try {
 				await axiosIntance.put(
-					`${API_URL}/libros/${selectedLibro.id}`,
+					`libros/${selectedLibro.id}`,
 					selectedLibro,
 				);
 				setShowEditModal(false);
@@ -173,7 +172,7 @@ const BooksPage = () => {
 
 	const handleAddLibro = async () => {
 		try {
-			await axiosIntance.post(`${API_URL}/libros`, newLibro);
+			await axiosIntance.post(`libros`, newLibro);
 			setShowAddModal(false);
 			setNewLibro({
 				nombreLibro: '',

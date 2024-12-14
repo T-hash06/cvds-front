@@ -14,7 +14,6 @@ import {
 	TableHeader,
 	TableRow,
 } from '@nextui-org/react';
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -65,7 +64,7 @@ const CategoriasPage = () => {
 
 	const fetchCategorias = async () => {
 		try {
-			const response = await axiosIntance.get(`${API_URL}/categorias`);
+			const response = await axiosIntance.get(`categorias`);
 			setCategorias(response.data);
 		} catch (error) {
 			console.error('Error al obtener categorías:', error);
@@ -76,7 +75,7 @@ const CategoriasPage = () => {
 	const handleAddCategoria = async () => {
 		try {
 			const response = await axiosIntance.post(
-				`${API_URL}/categorias`,
+				`categorias`,
 				newCategoria,
 			);
 			const categoria = response.data;
@@ -94,7 +93,7 @@ const CategoriasPage = () => {
 		if (editCategoria?.id) {
 			try {
 				const response = await axiosIntance.put(
-					`${API_URL}/categorias/${editCategoria.id}`,
+					`categorias/${editCategoria.id}`,
 					editCategoria,
 				);
 				const updatedCategoria = response.data;
@@ -115,7 +114,7 @@ const CategoriasPage = () => {
 
 	const handleDeleteCategoria = async (categoriaId: string) => {
 		try {
-			await axiosIntance.delete(`${API_URL}/categorias/${categoriaId}`);
+			await axiosIntance.delete(`categorias/${categoriaId}`);
 			setCategorias(categorias.filter((cat) => cat.id !== categoriaId));
 			toast.success('Categoría eliminada satisfactoriamente');
 		} catch (error) {
@@ -127,7 +126,7 @@ const CategoriasPage = () => {
 	const handleSubcategoriasClick = async (categoria: Categoria) => {
 		try {
 			const response = await axiosIntance.get(
-				`${API_URL}/subcategorias/byCategoria/${categoria.id}`,
+				`subcategorias/byCategoria/${categoria.id}`,
 			);
 			setSubcategorias(response.data);
 			setSelectedCategoria(categoria);
@@ -146,7 +145,7 @@ const CategoriasPage = () => {
 					categorias: [selectedCategoria],
 				};
 				const response = await axiosIntance.post(
-					`${API_URL}/subcategorias`,
+					`subcategorias`,
 					newSub,
 				);
 				const subcategoria = response.data;
@@ -166,7 +165,7 @@ const CategoriasPage = () => {
 		if (editSubcategoria?.idSubcategoria) {
 			try {
 				const response = await axiosIntance.put(
-					`${API_URL}/subcategorias/${editSubcategoria.idSubcategoria}`,
+					`subcategorias/${editSubcategoria.idSubcategoria}`,
 					editSubcategoria,
 				);
 				const updatedSubcategoria = response.data;
@@ -190,7 +189,7 @@ const CategoriasPage = () => {
 
 	const handleDeleteSubcategoria = async (subcategoriaId: string) => {
 		try {
-			await axiosIntance.delete(`${API_URL}/subcategorias/${subcategoriaId}`);
+			await axiosIntance.delete(`subcategorias/${subcategoriaId}`);
 			setSubcategorias(
 				subcategorias.filter(
 					(sub) => sub.idSubcategoria !== subcategoriaId,
