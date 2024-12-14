@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import MainLayout from '../../components/layouts/MainLayout';
+import axiosIntance from '../../shared/hooks/axiosIntance';
 
 import {
 	Button,
@@ -80,7 +81,7 @@ const BooksPage = () => {
 
 	const fetchLibros = useCallback(async () => {
 		try {
-			const response = await axios.get(`${API_URL}/libros`, {
+			const response = await axiosIntance.get(`${API_URL}/libros`, {
 				params: { page: page - 1, size: rowsPerPage },
 			});
 			setLibros(response.data.content);
@@ -93,7 +94,7 @@ const BooksPage = () => {
 
 	const searchLibros = useCallback(async () => {
 		try {
-			const response = await axios.get(
+			const response = await axiosIntance.get(
 				`${API_URL}/busquedas/${searchTerm}/parametro/${searchBy}/pagina/${
 					page - 1
 				}/tamano/${rowsPerPage}`,
@@ -124,7 +125,7 @@ const BooksPage = () => {
 
 	const deleteLibro = async (id: string) => {
 		try {
-			await axios.delete(`${API_URL}/libros/${id}`);
+			await axiosIntance.delete(`${API_URL}/libros/${id}`);
 			if (searchTerm) {
 				searchLibros();
 			} else {
@@ -151,7 +152,7 @@ const BooksPage = () => {
 	const handleSaveEdit = async () => {
 		if (selectedLibro) {
 			try {
-				await axios.put(
+				await axiosIntance.put(
 					`${API_URL}/libros/${selectedLibro.id}`,
 					selectedLibro,
 				);
@@ -172,7 +173,7 @@ const BooksPage = () => {
 
 	const handleAddLibro = async () => {
 		try {
-			await axios.post(`${API_URL}/libros`, newLibro);
+			await axiosIntance.post(`${API_URL}/libros`, newLibro);
 			setShowAddModal(false);
 			setNewLibro({
 				nombreLibro: '',
