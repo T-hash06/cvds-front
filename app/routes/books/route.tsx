@@ -26,7 +26,7 @@ import {
 	TableRow,
 } from '@nextui-org/react';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'https://backbibliosoft-hefxcthhhadjgxb0.canadacentral-01.azurewebsites.net';
 
 if (typeof window !== 'undefined') {
 	localStorage.setItem(
