@@ -1,4 +1,6 @@
 import {
+	Autocomplete,
+	AutocompleteItem,
 	Button,
 	Input,
 	Modal,
@@ -10,101 +12,59 @@ import {
 	SelectItem,
 	useDisclosure,
 } from '@nextui-org/react';
+import MainLayout from 'app/components/layouts/MainLayout';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import crearpPrestamo from './assets/crear-prestamo.png';
 import devolverPrestamo from './assets/devolver-prestamo.png';
 import listarPrestamo from './assets/listar-prestamos.png';
 import styles from './prestamo.module.css';
-import { useState } from 'react';
+import axiosIntance from '../../shared/hooks/axiosIntance';
 
-/**
- * Title component renders a heading with a specific style.
- *
- * @returns {JSX.Element} A heading element with the text "¿Qué deseas realizar?".
- */
+
 const Title = () => {
 	return <h1 className={styles.title}>¿Qué Acción Deseas Realizar?</h1>;
 };
 
-/**
- * Component for creating a loan (prestamo).
- *
- * This component allows users to select a user and a book to create a loan.
- * It includes a modal that opens when the "Realizar un Préstamo" button is clicked.
- * The modal contains input fields for filtering users by ID, selecting a user, and selecting a book.
- *
- * @component
- * @name CreatePrestamo
- *
- * @returns {JSX.Element} The rendered component.
- *
- * @example
- * <CreatePrestamo />
- *
- * @remarks
- * - The component uses `useDisclosure` for managing the modal state.
- * - The `handleConfirmar` function logs the loan details to the console and closes the modal.
- * - The `usuarios` and `libros` arrays contain sample data for users and books respectively.
- * - The `usuariosFiltrados` array filters users based on the `filtroId` state.
- * - The modal contains input fields for filtering users by ID, selecting a user, and selecting a book.
- * - The "Confirmar Préstamo" button is disabled until both a user and a book are selected.
- *
- * @dependencies
- * - `useDisclosure` from Chakra UI for modal state management.
- * - `useState` from React for managing component state.
- * - `Button`, `Modal`, `ModalContent`, `ModalHeader`, `ModalBody`, `ModalFooter`, `Input`, `Select`, and `SelectItem` components from a UI library.
- *
- * @state
- * @property {number | null} usuario - The selected user ID.
- * @property {number | null} libro - The selected book ID.
- * @property {string} filtroId - The filter string for user ID.
- *
- * @data
- * @property {Array<{id: number, nombre: string, email: string}>} usuarios - Sample data for users.
- * @property {Array<{id: number, titulo: string}>} libros - Sample data for books.
- *
- * @functions
- * @function handleConfirmar - Handles the confirmation of a loan.
- * @function setUsuario - Sets the selected user ID.
- * @function setLibro - Sets the selected book ID.
- * @function setFiltroId - Sets the filter string for user ID.
- */
 const CreatePrestamo = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	const [usuario, setUsuario] = useState<number | null>(null);
-	const [libro, setLibro] = useState<number | null>(null);
-	const [filtroId, setFiltroId] = useState('');
+	const [usuarios, setUsuarios] = useState([]);
+	const [libros, setLibros] = useState([]);
 
-	// Data de prueba
-	const usuarios = [
-		{ id: 1, nombre: 'Juan Pérez', email: 'juan.perez@example.com' },
-		{ id: 2, nombre: 'María García', email: 'maria.garcia@example.com' },
-		{
-			id: 3,
-			nombre: 'Carlos Rodríguez',
-			email: 'carlos.rodriguez@example.com',
-		},
-		{ id: 4, nombre: 'Ana Martínez', email: 'ana.martinez@example.com' },
-		{ id: 5, nombre: 'Luis González', email: 'luis.gonzalez@example.com' },
-		{ id: 6, nombre: 'Sofía López', email: 'sofia.lopez@example.com' },
-		{
-			id: 7,
-			nombre: 'Diego Fernández',
-			email: 'diego.fernandez@example.com',
-		},
-	];
+	const fetchBooks = async () => {
+		const response = await axiosIntance.get('/libros');
+		return response.data.content;
+	}
 
-	//Data de Prueba
-	const libros = [
-		{ id: 1, titulo: 'Cien años de soledad' },
-		{ id: 2, titulo: 'El principito' },
-		{ id: 3, titulo: '1984' },
-		{ id: 4, titulo: 'La sombra del viento' },
-	];
+	const getLibros = async () => {
+		const libros = await fetchBooks();
+		return libros;
+	}
+	
+	const fetchUsers = async () => {
+		const response = await axiosIntance.get('/users/students?pageNumber=1&pageSize=100');
+		return response.data.content;
+	}
 
-	const usuariosFiltrados = usuarios.filter(
-		(usuario) =>
-			filtroId === '' || usuario.id.toString().includes(filtroId),
-	);
+	const getUsuarios = async () => {
+		const usuarios = await fetchUsers();
+		console.log("Usuarios" + usuarios);
+		return usuarios;
+	}
+
+
+	useEffect(() => {
+		const fetchLibros = async () => {
+			const librosData = await getLibros();
+			setLibros(librosData);
+		};
+		const fetchUsuarios = async () => {
+			const usuariosData = await getUsuarios();
+			setUsuarios(usuariosData);
+		};
+		fetchUsuarios();
+		fetchLibros();
+	}, []);
 
 	/**
 	 * Handles the confirmation of a loan.
@@ -114,7 +74,6 @@ const CreatePrestamo = () => {
 	 * @name handleConfirmar
 	 */
 	const handleConfirmar = () => {
-		console.log('Préstamo realizado:', { usuario, libro });
 		onClose();
 	};
 
@@ -155,61 +114,23 @@ const CreatePrestamo = () => {
 							préstamo.
 						</p>
 
-						<Input
-							type='text'
-							label='Filtrar por ID de Usuario'
-							placeholder='Ingrese ID'
-							value={filtroId}
-							onChange={(e) => setFiltroId(e.target.value)}
+						<Autocomplete
 							className='mb-4'
-						/>
-
-						<Select
-							label='Seleccionar Usuario'
-							placeholder='Buscar usuario'
-							variant='bordered'
-							onSelectionChange={(keys) =>
-								setUsuario(Number(Array.from(keys)[0]))
-							}
-							selectedKeys={usuario ? [usuario.toString()] : []}
-							className='mb-4'
+							defaultItems={usuarios}
+							placeholder='Buscar por ID del estudiante'
+							label='Seleccionar Estudiante'
 						>
-							{usuariosFiltrados.map((user) => (
-								<SelectItem
-									key={user.id}
-									value={user.id}
-									textValue={`${user.nombre} (${user.email})`}
-								>
-									<div className='flex flex-col'>
-										<span className='font-bold'>
-											{user.nombre}
-										</span>
-										<span className='text-gray-500 text-small'>
-											ID: {user.id} | {user.email}
-										</span>
-									</div>
-								</SelectItem>
-							))}
-						</Select>
+							{/* {(item) => <AutocompleteItem key={item.id}>{item.name} ({item.id})</AutocompleteItem>} */}
+						</Autocomplete>
 
-						<Select
+						<Autocomplete
+							className='mb-4'
+							defaultItems={libros}
+							placeholder='Buscar por ID de libro'
 							label='Seleccionar Libro'
-							placeholder='Elige un libro'
-							variant='bordered'
-							onSelectionChange={(keys) =>
-								setLibro(Number(Array.from(keys)[0]))
-							}
-							selectedKeys={libro ? [libro.toString()] : []}
 						>
-							{libros.map((libroItem) => (
-								<SelectItem
-									key={libroItem.id}
-									value={libroItem.id}
-								>
-									{libroItem.titulo}
-								</SelectItem>
-							))}
-						</Select>
+							{(item) => <AutocompleteItem key={item.id}>{item.nombreLibro}</AutocompleteItem>}
+						</Autocomplete>
 					</ModalBody>
 					<ModalFooter>
 						<Button
@@ -222,7 +143,7 @@ const CreatePrestamo = () => {
 						<Button
 							color='primary'
 							onPress={handleConfirmar}
-							isDisabled={!usuario || !libro}
+							//isDisabled={!usuario || !libro}
 						>
 							Confirmar Préstamo
 						</Button>
@@ -233,59 +154,46 @@ const CreatePrestamo = () => {
 	);
 };
 
-/**
- * ReturnPrestamo component handles the process of returning a loaned book.
- *
- * This component provides a user interface for returning a loaned book by scanning its QR code or barcode.
- * It includes a modal dialog for confirming the return and displays success or error messages based on the input validation.
- *
- * @component
- *
- * @returns {JSX.Element} The rendered component.
- */
 const ReturnPrestamo = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [libro, setLibro] = useState<number | null>(null);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-	/**
-	 * Handles the confirmation of returning a loaned book.
-	 *
-	 * This function performs the following steps:
-	 * 1. Validates the `libro` (book ID) to ensure it is not null and is a valid number.
-	 * 2. If validation fails, sets an error message indicating that a valid book ID is required.
-	 * 3. If validation passes, logs the return of the loaned book.
-	 * 4. Sets a success message indicating the loan was successfully returned.
-	 * 5. Resets the `libro` state to null.
-	 * 6. Closes the confirmation dialog or modal.
-	 *
-	 * @returns {void}
-	 */
-	const handleConfirmar = () => {
-		if (libro === null || isNaN(libro)) {
+	const handleConfirmar = async () => {
+		if (libro !== null) {
+			const url = `https://odyv7fszai.execute-api.us-east-1.amazonaws.com/BiblioSoftAPI/prestamos/${libro}/devolver`;
+
+			try {
+				const response = await fetch(url, {
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				});
+
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+
+				const data = await response.json();
+				console.log('Préstamo devuelto:', data);
+				setSuccessMessage('Préstamo devuelto con éxito.');
+				setLibro(null);
+				onClose();
+			} catch (error) {
+				console.error('Error devolviendo el préstamo:', error);
+			}
+		} else {
 			setErrorMessage('Por favor, ingresa un ID de libro válido.');
-			return;
 		}
-
-		console.log('Préstamo devuelto:', libro);
-
-		setSuccessMessage('Préstamo devuelto con éxito.');
-		setLibro(null);
-		onClose();
 	};
 
-	/**
-	 * Handles the change event for an input element.
-	 * Converts the input value to a number and updates the state accordingly.
-	 * If the input value is not a valid number, it sets the libro state to null.
-	 *
-	 * @param {React.ChangeEvent<HTMLInputElement>} e - The change event from the input element.
-	 */
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		const numberValue = Number(value);
-		if (!isNaN(numberValue)) {
+
+		if (!Number.isNaN(numberValue)) {
 			setLibro(numberValue);
 			setErrorMessage(null);
 		} else {
@@ -312,7 +220,13 @@ const ReturnPrestamo = () => {
 					</h2>
 				</Button>
 			</div>
-			<Modal isOpen={isOpen} onClose={onClose}>
+			<Modal
+				isOpen={isOpen}
+				onClose={onClose}
+				placement='center'
+				backdrop='blur'
+				size='md'
+			>
 				<ModalContent>
 					<>
 						<ModalHeader>Devolver Préstamo</ModalHeader>
@@ -326,8 +240,8 @@ const ReturnPrestamo = () => {
 								label='Id del libro'
 								placeholder='Escribe el código aquí'
 								className='mb-4'
-								isRequired
-								isClearable
+								isRequired={true}
+								isClearable={true}
 								description='Escanea el código de barras o el código QR del libro que deseas devolver.'
 								errorMessage={errorMessage}
 								isInvalid={!!errorMessage}
@@ -350,7 +264,9 @@ const ReturnPrestamo = () => {
 							<Button
 								color='primary'
 								onClick={handleConfirmar}
-								isDisabled={libro === null || isNaN(libro)}
+								isDisabled={
+									libro === null || Number.isNaN(libro)
+								}
 							>
 								Confirmar
 							</Button>
@@ -362,20 +278,6 @@ const ReturnPrestamo = () => {
 	);
 };
 
-/**
- * Component that renders a card for listing loans.
- *
- * @component
- * @returns {JSX.Element} A JSX element representing the loan listing card.
- *
- * @example
- * <ListPrestamo />
- *
- * @remarks
- * This component displays an image and a button that links to the loan listing page.
- *
- * @see {@link https://example.com/prestamo/listar} for more information on the loan listing page.
- */
 const ListPrestamo = () => {
 	return (
 		<div className={styles.prestamoCard}>
@@ -398,12 +300,6 @@ const ListPrestamo = () => {
 	);
 };
 
-/**
- * The `Modules` component renders a container with three sub-components:
- * `CreatePrestamo`, `ReturnPrestamo`, and `ListPrestamo`.
- *
- * @returns A JSX element containing the prestamo modules.
- */
 const Modules = () => {
 	return (
 		<div className={styles.prestamoModules}>
@@ -414,18 +310,14 @@ const Modules = () => {
 	);
 };
 
-/**
- * Prestamo component renders the main page for the "prestamo" route.
- * It includes a Title component and a Modules component.
- *
- * @returns {JSX.Element} The JSX code for the Prestamo page.
- */
 const Prestamo = () => {
 	return (
-		<main className={styles.prestamoPage}>
-			<Title />
-			<Modules />
-		</main>
+		<MainLayout>
+			<main className={styles.prestamoPage}>
+				<Title />
+				<Modules />
+			</main>
+		</MainLayout>
 	);
 };
 

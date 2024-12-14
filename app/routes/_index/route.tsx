@@ -1,4 +1,8 @@
 import type { MetaFunction } from '@remix-run/node';
+import cookies from 'js-cookie';
+import { useEffect } from 'react';
+import { useNavigate } from '@remix-run/react';
+
 
 export const meta: MetaFunction = () => {
 	return [
@@ -7,6 +11,25 @@ export const meta: MetaFunction = () => {
 	];
 };
 
+const getToken = () => {
+	const token = cookies.get('$$id');
+    if (!token) {
+		return null;
+	} else {
+		return token;
+	}
+};
+
 export default function Index() {
-	return <h1>CVDS 2024</h1>;
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (!getToken()) {
+			navigate('/auth/login');
+		} else {
+			navigate('/general');
+		}
+	}, []);
+
+	return null;
 }
