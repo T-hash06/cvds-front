@@ -1,0 +1,77 @@
+.mainContainer {
+	display: flex;
+	min-height: 100vh;
+	width: 100%;
+}
+
+.mainContainer :global(.main-layout) {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	width: 100%;
+}
+
+.mainContainer :global(.main-layout > div) {
+	display: flex;
+	flex: 1;
+}
+
+.mainContainer :global(.main-layout main) {
+	flex: 1;
+	background-color: #f9fafb;
+}
+
+.flex-col {
+	flex-direction: column;
+}
+
+.studentsPage {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 1.5rem 2rem 2rem;
+	width: 100%;
+}
+
+.title {
+	font-size: 2rem;
+	font-weight: bold;
+	color: #1f2937;
+	text-align: center;
+}
+
+.buttonCustom {
+	background-color: #1e73be;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	cursor: pointer;
+	border-radius: 5px;
+}
+
+.buttonCustom:hover {
+	background-color: #4bc1d2;
+}
+
+.subtitle {
+	font-size: 1.5rem;
+	font-weight: bold;
+	color: #1f2937;
+	text-align: start;
+}
+
+.flexContainer {
+	display: flex;
+	justify-content: space-between;
+	gap: 2rem;
+}
+
+.column {
+	flex: 1;
+}
+
+.verticalDivider {
+	border-left: 1px solid #d1d5db;
+	height: auto;
+	margin: 0 1rem;
+}
