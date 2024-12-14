@@ -8,19 +8,16 @@ import {
 	ModalContent,
 	ModalFooter,
 	ModalHeader,
-	Select,
-	SelectItem,
 	useDisclosure,
 } from '@nextui-org/react';
 import MainLayout from 'app/components/layouts/MainLayout';
 import type React from 'react';
 import { useEffect, useState } from 'react';
+import axiosIntance from '../../shared/hooks/axiosIntance';
 import crearpPrestamo from './assets/crear-prestamo.png';
 import devolverPrestamo from './assets/devolver-prestamo.png';
 import listarPrestamo from './assets/listar-prestamos.png';
 import styles from './prestamo.module.css';
-import axiosIntance from '../../shared/hooks/axiosIntance';
-
 
 const Title = () => {
 	return <h1 className={styles.title}>¿Qué Acción Deseas Realizar?</h1>;
@@ -34,24 +31,25 @@ const CreatePrestamo = () => {
 	const fetchBooks = async () => {
 		const response = await axiosIntance.get('/libros');
 		return response.data.content;
-	}
+	};
 
 	const getLibros = async () => {
 		const libros = await fetchBooks();
 		return libros;
-	}
-	
+	};
+
 	const fetchUsers = async () => {
-		const response = await axiosIntance.get('/users/students?pageNumber=1&pageSize=100');
+		const response = await axiosIntance.get(
+			'/users/students?pageNumber=1&pageSize=100',
+		);
 		return response.data.content;
-	}
+	};
 
 	const getUsuarios = async () => {
 		const usuarios = await fetchUsers();
-		console.log("Usuarios" + usuarios);
+		// console.log('Usuarios' + usuarios);
 		return usuarios;
-	}
-
+	};
 
 	useEffect(() => {
 		const fetchLibros = async () => {
@@ -64,7 +62,7 @@ const CreatePrestamo = () => {
 		};
 		fetchUsuarios();
 		fetchLibros();
-	}, []);
+	});
 
 	/**
 	 * Handles the confirmation of a loan.
@@ -129,7 +127,11 @@ const CreatePrestamo = () => {
 							placeholder='Buscar por ID de libro'
 							label='Seleccionar Libro'
 						>
-							{(item) => <AutocompleteItem key={item.id}>{item.nombreLibro}</AutocompleteItem>}
+							{(item) => (
+								<AutocompleteItem key={item.id}>
+									{item.nombreLibro}
+								</AutocompleteItem>
+							)}
 						</Autocomplete>
 					</ModalBody>
 					<ModalFooter>

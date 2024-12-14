@@ -1,8 +1,7 @@
 import type { MetaFunction } from '@remix-run/node';
+import { useNavigate } from '@remix-run/react';
 import cookies from 'js-cookie';
 import { useEffect } from 'react';
-import { useNavigate } from '@remix-run/react';
-
 
 export const meta: MetaFunction = () => {
 	return [
@@ -13,11 +12,10 @@ export const meta: MetaFunction = () => {
 
 const getToken = () => {
 	const token = cookies.get('$$id');
-    if (!token) {
+	if (!token) {
 		return null;
-	} else {
-		return token;
 	}
+	return token;
 };
 
 export default function Index() {
@@ -29,7 +27,7 @@ export default function Index() {
 		} else {
 			navigate('/general');
 		}
-	}, []);
+	}, [navigate]);
 
 	return null;
 }
