@@ -20,7 +20,9 @@ import {
 	TableHeader,
 	TableRow,
 } from '@nextui-org/react';
+import MainLayout from 'app/components/layouts/MainLayout';
 import type React from 'react';
+import { useEffect } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import styles from './prestamoTable.module.css';
 
@@ -49,15 +51,7 @@ const INITIAL_COLUMNS = [
 const EditLoanModal: React.FC<{
 	loan: Loan | null;
 	onClose: () => void;
-	onSave: (loan: {
-		estado: 'Prestado' | 'Devuelto' | string;
-		fechaDevolucion: string;
-		idLibro: string;
-		fechaPrestamo: string;
-		observaciones: string;
-		idEstudiante: string;
-		id: string;
-	}) => void;
+	onSave: (loan: Loan) => void;
 }> = ({ loan, onClose, onSave }) => {
 	const [observaciones, setObservaciones] = useState(
 		loan?.observaciones || '',
@@ -65,7 +59,9 @@ const EditLoanModal: React.FC<{
 	const [fechaDevolucion, setFechaDevolucion] = useState(
 		loan?.fechaDevolucion || '',
 	);
-	const [estado, setEstado] = useState(loan?.estado || '');
+	const [estado, setEstado] = useState<'Prestado' | 'Devuelto'>(
+		loan?.estado || 'Prestado',
+	);
 
 	const handleSave = () => {
 		if (loan) {
@@ -79,7 +75,13 @@ const EditLoanModal: React.FC<{
 	};
 
 	return (
-		<Modal isOpen={!!loan} onClose={onClose}>
+		<Modal
+			isOpen={!!loan}
+			onClose={onClose}
+			placement='center'
+			backdrop='blur'
+			size='md'
+		>
 			<ModalContent>
 				<ModalHeader>Editar Préstamo</ModalHeader>
 				<ModalBody>
@@ -97,7 +99,9 @@ const EditLoanModal: React.FC<{
 					<Select
 						label='Estado'
 						value={estado}
-						onChange={(e) => setEstado(e.target.value)}
+						onChange={(e) =>
+							setEstado(e.target.value as 'Prestado' | 'Devuelto')
+						}
 					>
 						<SelectItem key='Prestado' value='Prestado'>
 							Prestado
@@ -132,7 +136,13 @@ const DeleteLoanModal: React.FC<{
 	};
 
 	return (
-		<Modal isOpen={!!loan} onClose={onClose}>
+		<Modal
+			isOpen={!!loan}
+			onClose={onClose}
+			placement='center'
+			backdrop='blur'
+			size='md'
+		>
 			<ModalContent>
 				<ModalHeader>Confirmar Eliminación</ModalHeader>
 				<ModalBody>
@@ -152,7 +162,6 @@ const DeleteLoanModal: React.FC<{
 };
 
 const PrestamoTable: React.FC = () => {
-	// Sample data
 	const [loans, setLoans] = useState<Loan[]>([
 		{
 			id: '674b4a9f8964470f827ade2c',
@@ -171,8 +180,6 @@ const PrestamoTable: React.FC = () => {
 			estado: 'Devuelto',
 		},
 	]);
-
-	// State for table management
 	const [filterValue, setFilterValue] = useState('');
 	const [_selectedKeys, setSelectedKeys] = useState<Selection>(new Set());
 	const [visibleColumns, _setVisibleColumns] = useState<Selection>(
@@ -184,11 +191,36 @@ const PrestamoTable: React.FC = () => {
 		direction: 'ascending',
 	});
 	const [page, setPage] = useState(1);
-
-	// Modal states
 	const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
 	const [isEditModalVisible, setEditModalVisible] = useState(false);
 	const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
+
+	useEffect(() => {
+		const fetchLoans = async () => {
+			const url =
+				'https://odyv7fszai.execute-api.us-east-1.amazonaws.com/BiblioSoftAPI/prestamos';
+			try {
+				const response = await fetch(url);
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				const data = await response.json();
+				const filteredData = data.map((loan: Loan) => ({
+					id: loan.id,
+					idEstudiante: loan.idEstudiante,
+					idLibro: loan.idLibro,
+					fechaPrestamo: loan.fechaPrestamo,
+					fechaDevolucion: loan.fechaDevolucion,
+					estado: loan.estado,
+				}));
+				setLoans(filteredData);
+			} catch (error) {
+				console.error('Error fetching loans:', error);
+			}
+		};
+
+		fetchLoans();
+	}, []);
 
 	// Filtering and sorting logic
 	const filteredItems = useMemo(() => {
@@ -274,16 +306,37 @@ const PrestamoTable: React.FC = () => {
 	}, [visibleColumns]);
 
 	const handleSaveChanges = (updatedLoan: Loan) => {
-		setLoans(
-			loans.map((loan) =>
-				loan.id === updatedLoan.id ? updatedLoan : loan,
-			),
-		);
-		setEditModalVisible(false);
+		const url = `https://odyv7fszai.execute-api.us-east-1.amazonaws.com/BiblioSoftAPI/prestamos/update/${updatedLoan.id}`;
+
+		fetch(url, {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(updatedLoan),
+		})
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
+				return response.json();
+			})
+			.then((data) => {
+				console.log('Success:', data);
+				setLoans(
+					loans.map((loan) =>
+						loan.id === updatedLoan.id ? updatedLoan : loan,
+					),
+				);
+				setEditModalVisible(false);
+			})
+			.catch((error) => {
+				console.error('Error:', error);
+			});
 	};
 
 	const handleDeleteLoan = (loanToDelete: Loan) => {
-		const url = `https://us-east-1.console.aws.amazon.com/apigateway/main/apis/odyv7fszai/resources/${loanToDelete.id}?api=odyv7fszai&region=us-east-1`;
+		const url = `https://odyv7fszai.execute-api.us-east-1.amazonaws.com/BiblioSoftAPI/prestamos/delete/${loanToDelete.id}`;
 
 		fetch(url, {
 			method: 'DELETE',
@@ -383,13 +436,15 @@ const PrestamoTable: React.FC = () => {
 
 const PrestamoPage: React.FC = () => {
 	return (
-		<main className={styles.prestamoPage}>
-			<h1 className={styles.title}>Lista de Préstamos</h1>
-			<PrestamoTable />
-			<Link href='/prestamo' className={styles.prestamoButtonLink}>
-				Volve
-			</Link>
-		</main>
+		<MainLayout>
+			<main className={styles.prestamoPage}>
+				<h1 className={styles.title}>Lista de Préstamos</h1>
+				<PrestamoTable />
+				<Link href='/prestamo' className={styles.prestamoButtonLink}>
+					Volver
+				</Link>
+			</main>
+		</MainLayout>
 	);
 };
 
