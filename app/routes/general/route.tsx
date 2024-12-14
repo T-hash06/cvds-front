@@ -1,7 +1,7 @@
 import { Link } from '@remix-run/react';
 import MainLayout from '../../components/layouts/MainLayout';
 import gestionLibros from './assets/standard.png';
-import gestionUsuarios from './assets/usuarios.png.png';
+import gestionUsuarios from './assets/usuarios.png';
 
 
 const BibliotecaPage = () => {
