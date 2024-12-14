@@ -81,7 +81,7 @@ const MainContent = () => {
 		mutationFn: fetchers.current.postLogin,
 		onSuccess: (data) => {
 			cookies.set('$$id', data);
-			navigate('/');
+			navigate('/general');
 		},
 		onError: (error) => {
 			if (isAxiosError(error)) {
