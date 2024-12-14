@@ -15,7 +15,7 @@ const SubtitleResponsible = () => {
 	return <h2 className={styles.subtitle}>Información del Responsable</h2>
 };
 
-const AddStudent = () => {
+const AddResponsible = () => {
 	const [formData, setFormData] = useState({
 		responsibleName: '',
 		responsibleDoc: '',
@@ -144,4 +144,4 @@ const AddStudent = () => {
 	);
 };
 
-export default AddStudent;
+export default AddResponsible;

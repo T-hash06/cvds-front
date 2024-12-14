@@ -26,6 +26,7 @@ const AddStudent = () => {
 		studentDoc: '',
 		grade: '',
 		course: '',
+		id: '',
 		responsibleDoc: ''
 	});
 
@@ -58,6 +59,10 @@ const AddStudent = () => {
 			alert('Ingresa el curso actual del estudiante.');
 			return;
 		}
+		if (formData.id.trim() === '') {
+			alert('Ingresa el id del estudiante.');
+			return;
+		}
 		if (formData.responsibleDoc.trim() === '') {
 			alert('Ingresa el documento del responsable.');
 			return;
@@ -73,9 +78,9 @@ const AddStudent = () => {
 			studentDoc: '',
 			grade: '',
 			course: '',
+			id: '',
 			responsibleDoc: ''
 		});
-
 	};
 
 	return (
@@ -123,7 +128,11 @@ const AddStudent = () => {
 								name="grade"
 								value={formData.grade}
 								onChange={handleChange}
-							/> <br/>
+							/>
+						</div>
+						<div className={styles.verticalDivider}></div>
+						<div className={styles.column}>
+							<br/><br/>
 							<Input
 								isRequired
 								key={"outside"}
@@ -132,10 +141,16 @@ const AddStudent = () => {
 								name="course"
 								value={formData.course}
 								onChange={handleChange}
-							/>
-						</div>
-						<div className={styles.verticalDivider}></div>
-						<div className={styles.column}>
+							/> <br/>
+							<Input
+								isRequired
+								key={"outside"}
+								label="Codigo"
+								labelPlacement={"outside"}
+								name={"id"}
+								value={formData.id}
+								onChange={handleChange}
+							/><br/>
 							<SubtitleResponsible/>
 							<br/>
 							<Input
@@ -146,7 +161,7 @@ const AddStudent = () => {
 								name="responsibleDoc"
 								value={formData.responsibleDoc}
 								onChange={handleChange}
-							/> <br/>
+							/>
 						</div>
 					</div>
 					<br/>
