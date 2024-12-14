@@ -1,7 +1,8 @@
-import { Outlet } from '@remix-run/react';
-import type { FC, ReactNode } from 'react';
-import Navbar from '../navbar/navbarUser';
-import Sidebar from '../sidebar/Sidebar';
+import { Outlet } from "@remix-run/react";
+import type { FC, ReactNode } from "react";
+import Navbar from "../navbar/navbarUser";
+import Sidebar from "../sidebar/Sidebar";
+import CustomScrollbar from "../custom-scrollbar/CustomScrollbar";
 
 interface MainLayoutProps {
 	children: ReactNode;
@@ -9,14 +10,15 @@ interface MainLayoutProps {
 
 const MainLayout: FC<MainLayoutProps> = ({ children }) => {
 	return (
-		<div className={'main-layout'}>
+		<div className="main-layout">
 			<Navbar />
-			<div style={{ display: 'flex' }}>
+			<div style={{ display: "flex", height: "100vh" }}>
 				<Sidebar />
 				<main style={{ flex: 1 }}>
-					<Outlet />{' '}
-					{/* Este es el espacio donde se renderizarán las páginas específicas */}
-					{children}
+					<CustomScrollbar height="100%">
+						<Outlet />
+						{children}
+					</CustomScrollbar>
 				</main>
 			</div>
 		</div>

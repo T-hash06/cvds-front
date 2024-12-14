@@ -1,0 +1,22 @@
+.custom-scrollbar {
+	scrollbar-width: thin; /* Para navegadores como Firefox */
+	scrollbar-color: #888 #f0f0f0; /* Colores del scroll y fondo */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+	width: 8px; /* Ancho del scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+	background: #f0f0f0; /* Fondo del track */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+	background-color: #888; /* Color del scrollbar */
+	border-radius: 10px; /* Bordes redondeados */
+	border: 2px solid #f0f0f0; /* Espacio alrededor */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+	background-color: #555; /* Color al pasar el mouse */
+}
