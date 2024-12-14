@@ -4,7 +4,7 @@ import { CiMenuBurger, CiMenuFries } from 'react-icons/ci';
 
 const sectionsByRole: Record<string, { name: string; path: string }[]> = {
     admin: [
-        { name: 'Inicio', path: '/admin/home' },
+        { name: 'Inicio', path: '/general' },
         { name: 'Adicionar Estudiante', path: '/students-add' },
         { name: 'Adicionar Responsable', path: '/responsible-add' },
         { name: 'Adicionar Curso', path: '/course-add' },

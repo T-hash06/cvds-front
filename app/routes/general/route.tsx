@@ -1,6 +1,8 @@
 import { Link } from '@remix-run/react';
 import MainLayout from '../../components/layouts/MainLayout';
 import gestionLibros from './assets/standard.png';
+import gestionUsuarios from './assets/usuarios.png.png';
+
 
 const BibliotecaPage = () => {
 	return (
@@ -20,6 +22,22 @@ const BibliotecaPage = () => {
 				<div>
 					<h1 className='text-2xl font-semibold text-blue-700'>
 						Gestion de libros
+					</h1>
+				</div>
+				<Link to='/users-management'>
+					<div className='border-2 border-white-700 p-2 rounded-lg m-6'>
+						<img
+							src={gestionUsuarios}
+							alt='Gestionar usuarios'
+							className='max-w-full h-auto'
+							style={{ width: '300px', height: 'auto' }}
+						/>
+					</div>
+				</Link>
+
+				<div>
+					<h1 className='text-2xl font-semibold text-blue-700'>
+						Gestion de usuarios
 					</h1>
 				</div>
 			</div>
