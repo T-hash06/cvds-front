@@ -6,6 +6,7 @@ import {
 import { useState } from 'react';
 import UsersManagementLayout from '../../components/layouts/UsersManagementLayout';
 import styles from './course.add.module.css';
+import axios from "axios";
 
 const Title = () => {
 	return <h1 className={styles.title}>Adicionar Curso</h1>;
@@ -29,7 +30,7 @@ const AddCourse = () => {
 		});
 	};
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		if (formData.courseName.trim() === '') {
 			alert('Ingresa un nombre para el curso.');
 			return;
@@ -39,14 +40,36 @@ const AddCourse = () => {
 			return;
 		}
 
-		// Envío a API
+		try {
+			const courseData = {
+				name: formData.courseName,
+				gradeName: formData.gradeName
+			};
 
-		console.log('Datos del formulario:', formData);
+			const response = await axios.post(
+				'https://usermanagementbibliosoft-c0bhema4b0ewf4hh.eastus-01.azurewebsites.net/register/courses',
+				courseData,
+				{
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				}
+			);
 
-		setFormData({
-			courseName: '',
-			gradeName: ''
-		});
+			if (response.status === 200) {
+				alert('Curso registrado exitosamente');
+				setFormData({
+					courseName: '',
+					gradeName: ''
+				});
+			}
+		} catch (err) {
+			if (axios.isAxiosError(err)) {
+				alert(err.response?.data?.message || 'Error al registrar el curso');
+			} else {
+				alert('Error al conectar con el servidor');
+			}
+		}
 
 	};
 

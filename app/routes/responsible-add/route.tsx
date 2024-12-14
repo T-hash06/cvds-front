@@ -6,6 +6,7 @@ import {
 import { useState } from 'react';
 import UsersManagementLayout from '../../components/layouts/UsersManagementLayout';
 import styles from './responsible.add.module.css';
+import axios from "axios";
 
 const Title = () => {
 	return <h1 className={styles.title}>Adicionar Responsable</h1>;
@@ -32,7 +33,7 @@ const AddResponsible = () => {
 		});
 	};
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		if (formData.responsibleName.trim() === '') {
 			alert('Ingresa un nombre de un responsable.');
 			return;
@@ -54,17 +55,42 @@ const AddResponsible = () => {
 			return;
 		}
 
-		// Envío a API
+		try {
+			const responsibleData = {
+				document: formData.responsibleDoc,
+				siteDocument: formData.placeDoc,
+				name: formData.responsibleName,
+				phoneNumber: formData.cellNumber,
+				email: formData.email
+			};
 
-		console.log('Datos del formulario:', formData);
+			const response = await axios.post(
+				'https://usermanagementbibliosoft-c0bhema4b0ewf4hh.eastus-01.azurewebsites.net/register/responsible',
+				responsibleData,
+				{
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				}
+			);
 
-		setFormData({
-			responsibleName: '',
-			responsibleDoc: '',
-			placeDoc: '',
-			email: '',
-			cellNumber: ''
-		});
+			if (response.status === 200) {
+				alert('Responsable registrado exitosamente');
+				setFormData({
+					responsibleName: '',
+					responsibleDoc: '',
+					placeDoc: '',
+					email: '',
+					cellNumber: ''
+				});
+			}
+		} catch (err) {
+			if (axios.isAxiosError(err)) {
+				alert(err.response?.data?.message || 'Error al registrar el responsable');
+			} else {
+				alert('Error al conectar con el servidor');
+			}
+		}
 
 	};
 

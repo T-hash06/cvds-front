@@ -143,10 +143,7 @@ const AddStudent = () => {
 			}
 		} catch (err) {
 			if (axios.isAxiosError(err)) {
-				setError(
-					err.response?.data?.message ||
-						'Error al registrar el estudiante',
-				);
+				alert(err.response?.data?.message || 'Error al registrar el estudiante');
 			} else {
 				setError('Error al conectar con el servidor');
 			}
