@@ -26,7 +26,7 @@ import {
 	TableRow,
 } from '@nextui-org/react';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'https://backbibliosoft-hefxcthhhadjgxb0.canadacentral-01.azurewebsites.net';
 
 interface Ejemplar {
 	id?: string;
@@ -105,7 +105,6 @@ const EjemplaresPage = () => {
 
 			setEjemplares(ejemplaresWithBarcode);
 			setTotalPages(Math.ceil(response.data.length / rowsPerPage));
-			toast.success('Ejemplares cargados satisfactoriamente');
 		} catch (error) {
 			console.error('Error al obtener ejemplares:', error);
 			toast.error('No se pudo cargar los ejemplares');

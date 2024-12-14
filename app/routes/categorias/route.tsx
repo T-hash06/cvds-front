@@ -21,7 +21,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "@remix-run/react";
 import MainLayout from '../../components/layouts/MainLayout';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'https://backbibliosoft-hefxcthhhadjgxb0.canadacentral-01.azurewebsites.net';
 
 interface Categoria {
 	id?: string;
