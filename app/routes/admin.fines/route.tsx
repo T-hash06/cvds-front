@@ -1,7 +1,3 @@
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import React from 'react';
-
 import {
 	Button,
 	Card,
@@ -16,6 +12,11 @@ import {
 	TableRow,
 } from '@nextui-org/react';
 import { useAxios } from '@shared/hooks/axios';
+import axios from 'axios';
+import cookies from 'js-cookie';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import React from 'react';
 import MainLayout from '../../components/layouts/MainLayout';
 // Fines DTO
 interface FineDTO {
@@ -51,7 +52,7 @@ const generatePDF = (fines: FineDTO[]) => {
 		`$${fine.amount}`,
 		fine.fineStatus,
 		fine.fineType,
-		fine.expiredDate.toLocaleDateString(),
+		new Date(fine.expiredDate).toLocaleDateString(),
 	]);
 
 	autoTable(doc, {
@@ -90,216 +91,73 @@ const TableFines: React.FC<TableFineProps> = ({ fines }) => (
 		</TableHeader>
 
 		<TableBody>
-			{fines.map((fine) => (
-				<TableRow key={fine.fineId}>
-					<TableCell>{fine.bookTitle}</TableCell>
-					<TableCell>{fine.description}</TableCell>
-					<TableCell>{`$${fine.amount}`}</TableCell>
-					<TableCell>{fine.fineStatus}</TableCell>
-					<TableCell>{fine.fineType}</TableCell>
-					<TableCell>
-						{fine.expiredDate.toLocaleDateString()}
-					</TableCell>
+			{fines ? (
+				fines.map((fine) => (
+					<TableRow key={fine.fineId}>
+						<TableCell>{fine.bookTitle}</TableCell>
+						<TableCell>{fine.description}</TableCell>
+						<TableCell>{`$${fine.amount}`}</TableCell>
+						<TableCell>{fine.fineStatus}</TableCell>
+						<TableCell>{fine.fineType}</TableCell>
+						<TableCell>
+							{new Date(fine.expiredDate).toLocaleDateString()}
+						</TableCell>
+					</TableRow>
+				))
+			) : (
+				<TableRow>
+					<TableCell>No hay multas</TableCell>
+					<TableCell>No hay multas</TableCell>
+					<TableCell>No hay multas</TableCell>
+					<TableCell>No hay multas</TableCell>
+					<TableCell>No hay multas</TableCell>
+					<TableCell>No hay multas</TableCell>
 				</TableRow>
-			))}
+			)}
 		</TableBody>
 	</Table>
 );
-/**
- * This array represents a Mock of the fines obtained from the API.
- */
-const mockFines: FineDTO[] = [
-	{
-		fineId: 'fine-id-1',
-		description: 'Entrego en mal estado',
-		amount: 8500,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 11, 25),
-		bookTitle: 'Boulevard',
-	},
-	{
-		fineId: 'fine-id-2',
-		description: 'Entrego tarde',
-		amount: 5000.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 11, 30),
-		bookTitle: 'Harry Potter',
-	},
-	{
-		fineId: 'fine-id-3',
-		description: 'Entrego tarde',
-		amount: 2000.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 1),
-		bookTitle: 'El principito',
-	},
-	{
-		fineId: 'fine-id-4',
-		description: 'Entrego en mal estado',
-		amount: 12000.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 5),
-		bookTitle: 'Cien años de soledad',
-	},
-	{
-		fineId: 'fine-id-5',
-		description: 'Entrego tarde',
-		amount: 14500.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 10),
-		bookTitle: 'Don Quijote de la Mancha',
-	},
-	{
-		fineId: 'fine-id-6',
-		description: 'Entrego en mal estado',
-		amount: 15000.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 12),
-		bookTitle: '1984',
-	},
-	{
-		fineId: 'fine-id-7',
-		description: 'Entrego tarde',
-		amount: 11000.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 15),
-		bookTitle: 'Matar a un ruiseñor',
-	},
-	{
-		fineId: 'fine-id-8',
-		description: 'Entrego en mal estado',
-		amount: 7000.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 20),
-		bookTitle: 'Orgullo y prejuicio',
-	},
-	{
-		fineId: 'fine-id-9',
-		description: 'Entrego tarde',
-		amount: 13000.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 22),
-		bookTitle: 'El Gran Gatsby',
-	},
-	{
-		fineId: 'fine-id-10',
-		description: 'Entrego en mal estado',
-		amount: 9500.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 23),
-		bookTitle: 'Crimen y castigo',
-	},
-	{
-		fineId: 'fine-id-11',
-		description: 'Entrego tarde',
-		amount: 10000.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 25),
-		bookTitle: 'Cumbres Borrascosas',
-	},
-	{
-		fineId: 'fine-id-12',
-		description: 'Entrego en mal estado',
-		amount: 7000.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 28),
-		bookTitle: 'La Odisea',
-	},
-	{
-		fineId: 'fine-id-13',
-		description: 'Entrego tarde',
-		amount: 11000.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 30),
-		bookTitle: 'El señor de los anillos',
-	},
-	{
-		fineId: 'fine-id-14',
-		description: 'Entrego en mal estado',
-		amount: 8500.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 6),
-		bookTitle: 'El Hobbit',
-	},
-	{
-		fineId: 'fine-id-15',
-		description: 'Entrego tarde',
-		amount: 12500.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 8),
-		bookTitle: 'Los Miserables',
-	},
-	{
-		fineId: 'fine-id-16',
-		description: 'Entrego en mal estado',
-		amount: 13500.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 10),
-		bookTitle: 'Ana Karenina',
-	},
-	{
-		fineId: 'fine-id-17',
-		description: 'Entrego tarde',
-		amount: 14500.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 12),
-		bookTitle: 'Ulises',
-	},
-	{
-		fineId: 'fine-id-18',
-		description: 'Entrego en mal estado',
-		amount: 10000.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 15),
-		bookTitle: 'El alquimista',
-	},
-	{
-		fineId: 'fine-id-19',
-		description: 'Entrego tarde',
-		amount: 8500.0,
-		fineStatus: 'PENDING',
-		fineType: 'RETARDMENT',
-		expiredDate: new Date(2024, 12, 17),
-		bookTitle: 'La sombra del viento',
-	},
-	{
-		fineId: 'fine-id-20',
-		description: 'Entrego en mal estado',
-		amount: 12000.0,
-		fineStatus: 'PENDING',
-		fineType: 'DAMAGE',
-		expiredDate: new Date(2024, 12, 20),
-		bookTitle: 'El retrato de Dorian Gray',
-	},
-];
 const MainContent = () => {
 	const [fines, setFines] = React.useState<FineDTO[]>([]);
-
+	const fetchers = React.useRef({
+		getFines: async (page: number, size: number) => {
+			const token = cookies.get('$$id');
+			const response = await axios
+				.get(
+					`https://odyv7fszai.execute-api.us-east-1.amazonaws.com/BiblioSoftAPI/notifications/admin/fines-pending?page=${page}&size=${size}`,
+					{
+						headers: {
+							authorization: `Bearer ${token}`,
+							'Content-Type': 'application/json',
+						},
+					},
+				)
+				.then((response) => {
+					return response.data;
+				})
+				.catch((error) => {
+					console.error('Error:', error); // Maneja el error
+					return {
+						data: [],
+						totalItems: 0,
+						totalPages: 1,
+					};
+				});
+			return response;
+		},
+	});
 	React.useEffect(() => {
 		// Simula carga de datos de API
-		setFines(mockFines);
+		const fetchAndSetFines = async () => {
+			const fines = await fetchers.current.getFines(0, 10);
+			setFines(fines.data);
+		};
+
+		fetchAndSetFines();
 	}, []);
 
 	const generateReport = () => {
-		generatePDF(mockFines);
+		generatePDF(fines);
 	};
 	return (
 		<Card className='card-admin-fines'>

@@ -11,35 +11,82 @@ import {
 	User,
 } from '@nextui-org/react';
 import { useNavigate } from '@remix-run/react';
+import axios from 'axios';
+import cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
 import { Bell, LogOut, User as UserLogo } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import type React from 'react';
 
 // DTO Notificaciones navbar
 type Notification = {
 	id: string;
-	message: string;
+	notificationType: string;
+	bookName: string;
 };
 
-const NotificationService = (): Notification[] => {
-	// Aquí va la lógica de obtener notificaciones del API
-	const mockNotifications: Notification[] = [
-		{ id: '1', message: 'Notificación 1' },
-		{ id: '2', message: 'Notificación 2' },
-		{ id: '3', message: 'Notificación 3' },
-		{ id: '4', message: 'Notificación 4' },
-		{ id: '5', message: 'Notificación 5' },
-		{ id: '6', message: 'Notificación 6' },
-		{ id: '7', message: 'Notificación 7' },
-		{ id: '8', message: 'Notificación 8' },
-		{ id: '9', message: 'Notificación 9' },
-	];
-	return mockNotifications;
+interface TokenPayload {
+	id: string;
+}
+
+const getUserId = (token: string | undefined): string | null => {
+	try {
+		if (token === undefined) {
+			return null;
+		}
+		// Decodificar el token sin verificar la clave secreta
+		const decoded = jwtDecode<TokenPayload>(token);
+
+		// Devuelve el userId si existe
+		return decoded?.id || 'no';
+	} catch (error) {
+		console.error('Error al decodificar el token:', error);
+		return 'no';
+	}
 };
+
+const NotificationService = async (
+	page: number,
+	size: number,
+): Promise<Notification[]> => {
+	const token = cookies.get('$$id');
+	const userId = getUserId(token); // Reemplaza por tu lógica para obtener el userId.
+
+	try {
+		const response = await axios.get<{ data: Notification[] }>(
+			`https://odyv7fszai.execute-api.us-east-1.amazonaws.com/BiblioSoftAPI/notifications/users/user/${userId}?page=${page}&size=${size}`,
+			{
+				headers: {
+					authorization: `Bearer ${token}`,
+					'Content-Type': 'application/json',
+				},
+			},
+		);
+
+		// Retorna los datos directamente.
+		return response.data.data;
+	} catch (error) {
+		console.error('Error fetching notifications:', error);
+		// Devuelve un array vacío si ocurre un error.
+		return [];
+	}
+};
+
 const NavBarUser: React.FC = () => {
-	const notifications = [
-		...NotificationService(),
-		{ id: 'ver-mas', message: 'Ver más' },
-	];
+	const [notifications, setNotifications] = useState<Notification[]>([]);
+
+	useEffect(() => {
+		const fetchNotifications = async () => {
+			const apiNotifications = await NotificationService(0, 10);
+			setNotifications([
+				...apiNotifications,
+				{ id: 'ver-mas', notificationType: 'FINE', bookName: 'sss' },
+			]);
+		};
+
+		fetchNotifications();
+	}, []);
+
 	const navigate = useNavigate();
 
 	const handleNavigation = (route: string) => {
@@ -78,11 +125,11 @@ const NavBarUser: React.FC = () => {
 											)
 										}
 									>
-										{notification.message}
+										{'ver mas'}
 									</DropdownItem>
 								) : (
 									<DropdownItem key={notification.id}>
-										{notification.message}
+										{`${notification.bookName} - ${notification.notificationType}`}
 									</DropdownItem>
 								),
 							)}
