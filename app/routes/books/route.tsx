@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import MainLayout from '../../components/layouts/MainLayout';
-import axiosIntance from '../../shared/hooks/axiosIntance';
 
 import {
 	Button,
@@ -27,7 +26,8 @@ import {
 	TableRow,
 } from '@nextui-org/react';
 
-const API_URL = 'https://odyv7fszai.execute-api.us-east-1.amazonaws.com/BiblioSoftAPI/';
+const API_URL =
+	'https://backbibliosoft-hefxcthhhadjgxb0.canadacentral-01.azurewebsites.net';
 
 if (typeof window !== 'undefined') {
 	localStorage.setItem(
@@ -36,7 +36,7 @@ if (typeof window !== 'undefined') {
 	);
 	const token = localStorage.getItem('token');
 	if (token) {
-		// axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+		axios.defaults.headers.common.Authorization = `Bearer ${token}`;
 	}
 }
 
@@ -80,7 +80,7 @@ const BooksPage = () => {
 
 	const fetchLibros = useCallback(async () => {
 		try {
-			const response = await axiosIntance.get(`${API_URL}/libros`, {
+			const response = await axios.get(`${API_URL}/libros`, {
 				params: { page: page - 1, size: rowsPerPage },
 			});
 			setLibros(response.data.content);
@@ -93,7 +93,7 @@ const BooksPage = () => {
 
 	const searchLibros = useCallback(async () => {
 		try {
-			const response = await axiosIntance.get(
+			const response = await axios.get(
 				`${API_URL}/busquedas/${searchTerm}/parametro/${searchBy}/pagina/${
 					page - 1
 				}/tamano/${rowsPerPage}`,
@@ -124,7 +124,7 @@ const BooksPage = () => {
 
 	const deleteLibro = async (id: string) => {
 		try {
-			await axiosIntance.delete(`${API_URL}/libros/${id}`);
+			await axios.delete(`${API_URL}/libros/${id}`);
 			if (searchTerm) {
 				searchLibros();
 			} else {
@@ -151,7 +151,7 @@ const BooksPage = () => {
 	const handleSaveEdit = async () => {
 		if (selectedLibro) {
 			try {
-				await axiosIntance.put(
+				await axios.put(
 					`${API_URL}/libros/${selectedLibro.id}`,
 					selectedLibro,
 				);
@@ -172,7 +172,7 @@ const BooksPage = () => {
 
 	const handleAddLibro = async () => {
 		try {
-			await axiosIntance.post(`${API_URL}/libros`, newLibro);
+			await axios.post(`${API_URL}/libros`, newLibro);
 			setShowAddModal(false);
 			setNewLibro({
 				nombreLibro: '',
