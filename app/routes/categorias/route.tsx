@@ -18,7 +18,8 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "@remix-run/react";
+import MainLayout from '../../components/layouts/MainLayout';
 
 const API_URL = 'http://localhost:8080';
 
@@ -263,6 +264,7 @@ const CategoriasPage = () => {
 	);
 
 	return (
+		<MainLayout>
 		<div className='p-6 bg-blue-50 min-h-screen'>
 			<div className='flex items-center justify-between mb-6'>
 				<Button
@@ -528,6 +530,7 @@ const CategoriasPage = () => {
 				hideProgressBar={false}
 			/>
 		</div>
+	</MainLayout>
 	);
 };
 

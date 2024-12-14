@@ -7,7 +7,7 @@ const sectionsByRole: Record<string, { name: string; path: string }[]> = {
 		{ name: 'Inicio', path: '/admin/home' },
 		{ name: 'Historial Préstamos', path: '/admin/loans' },
 		{ name: 'Historial Devoluciones', path: '/admin/returns' },
-		{ name: 'Gestionar Libros', path: '/admin/books' },
+		{ name: 'Gestionar Libros', path: '/books' },
 		{ name: 'Soporte', path: '/admin/support' },
 		{ name: 'Salir', path: '/logout' },
 	],
