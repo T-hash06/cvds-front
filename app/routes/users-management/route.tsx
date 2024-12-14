@@ -1,9 +1,8 @@
 import {
 	Button,
 } from '@nextui-org/react';
-import { useState } from 'react';
 import MainLayout from '../../components/layouts/MainLayout';
-import styles from './students.module.css';
+import styles from './users-management.module.css';
 
 import registrarEstudiante from './assets/registrar_estudiante.svg';
 import registrarResponsable from './assets/registrar_responsable.svg';
