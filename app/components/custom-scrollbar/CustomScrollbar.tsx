@@ -1,5 +1,5 @@
-import type { FC, ReactNode } from "react";
-import "./CustomScrollbar.css";
+import type { FC, ReactNode } from 'react';
+import './CustomScrollbar.css';
 
 interface CustomScrollbarProps {
 	children: ReactNode;
@@ -9,17 +9,17 @@ interface CustomScrollbarProps {
 
 const CustomScrollbar: FC<CustomScrollbarProps> = ({
 	children,
-	height = "100%",
-	width = "100%",
+	height = '100%',
+	width = '100%',
 }) => {
 	return (
 		<div
-			className="custom-scrollbar"
+			className='custom-scrollbar'
 			style={{
 				height: height,
 				width: width,
-				overflowY: "auto",
-				overflowX: "hidden",
+				overflowY: 'auto',
+				overflowX: 'hidden',
 			}}
 		>
 			{children}

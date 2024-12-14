@@ -1,9 +1,9 @@
 import { useNavigate } from '@remix-run/react';
-import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import MainLayout from '../../components/layouts/MainLayout';
+import axiosIntance from '../../shared/hooks/axiosIntance';
 
 import {
 	Button,
@@ -26,7 +26,7 @@ import {
 	TableRow,
 } from '@nextui-org/react';
 
-const API_URL = 'https://backbibliosoft-hefxcthhhadjgxb0.canadacentral-01.azurewebsites.net';
+const API_URL = 'https://odyv7fszai.execute-api.us-east-1.amazonaws.com/BiblioSoftAPI/';
 
 if (typeof window !== 'undefined') {
 	localStorage.setItem(
@@ -35,7 +35,7 @@ if (typeof window !== 'undefined') {
 	);
 	const token = localStorage.getItem('token');
 	if (token) {
-		axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+		// axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 	}
 }
 
@@ -74,13 +74,12 @@ const BooksPage = () => {
 	const capitalizeFirstLetter = (text: string) => {
 		return text.charAt(0).toUpperCase() + text.slice(1);
 	};
-	
 
 	const navigate = useNavigate();
 
 	const fetchLibros = useCallback(async () => {
 		try {
-			const response = await axios.get(`${API_URL}/libros`, {
+			const response = await axiosIntance.get(`libros`, {
 				params: { page: page - 1, size: rowsPerPage },
 			});
 			setLibros(response.data.content);
@@ -93,8 +92,8 @@ const BooksPage = () => {
 
 	const searchLibros = useCallback(async () => {
 		try {
-			const response = await axios.get(
-				`${API_URL}/busquedas/${searchTerm}/parametro/${searchBy}/pagina/${
+			const response = await axiosIntance.get(
+				`busquedas/${searchTerm}/parametro/${searchBy}/pagina/${
 					page - 1
 				}/tamano/${rowsPerPage}`,
 			);
@@ -124,7 +123,7 @@ const BooksPage = () => {
 
 	const deleteLibro = async (id: string) => {
 		try {
-			await axios.delete(`${API_URL}/libros/${id}`);
+			await axiosIntance.delete(`libros/${id}`);
 			if (searchTerm) {
 				searchLibros();
 			} else {
@@ -151,8 +150,8 @@ const BooksPage = () => {
 	const handleSaveEdit = async () => {
 		if (selectedLibro) {
 			try {
-				await axios.put(
-					`${API_URL}/libros/${selectedLibro.id}`,
+				await axiosIntance.put(
+					`libros/${selectedLibro.id}`,
 					selectedLibro,
 				);
 				setShowEditModal(false);
@@ -172,7 +171,7 @@ const BooksPage = () => {
 
 	const handleAddLibro = async () => {
 		try {
-			await axios.post(`${API_URL}/libros`, newLibro);
+			await axiosIntance.post(`libros`, newLibro);
 			setShowAddModal(false);
 			setNewLibro({
 				nombreLibro: '',
@@ -220,13 +219,19 @@ const BooksPage = () => {
 					} else if (key === 'ejemplares') {
 						if (libro.id) {
 							localStorage.setItem('libroId', libro.id);
-							localStorage.setItem('nombreLibro', libro.nombreLibro);
+							localStorage.setItem(
+								'nombreLibro',
+								libro.nombreLibro,
+							);
 							navigate('/ejemplares');
 						}
 					} else if (key === 'categorias') {
 						if (libro.id) {
 							localStorage.setItem('libroId', libro.id);
-							localStorage.setItem('nombreLibro', libro.nombreLibro);
+							localStorage.setItem(
+								'nombreLibro',
+								libro.nombreLibro,
+							);
 							navigate('/categorias');
 						}
 					}
@@ -262,147 +267,157 @@ const BooksPage = () => {
 						</Button>
 					</div>
 				</div>
-					
 
-	
-					<div className='flex gap-4 items-center mb-6'>
-						<Input
-							isClearable
-							placeholder='Buscar...'
-							value={searchTerm}
-							onChange={(e) => setSearchTerm(e.target.value)}
-						/>
-						<Dropdown>
-							<DropdownTrigger>
-								<Button>{searchBy}</Button>
-							</DropdownTrigger>
-							<DropdownMenu
-								onAction={(key) => {
-									const itemTexts: { [key in 'autor' | 'nombreLibro' | 'editor' | 'sinopsis']: string } = {
+				<div className='flex gap-4 items-center mb-6'>
+					<Input
+						isClearable={true}
+						placeholder='Buscar...'
+						value={searchTerm}
+						onChange={(e) => setSearchTerm(e.target.value)}
+					/>
+					<Dropdown>
+						<DropdownTrigger>
+							<Button>{searchBy}</Button>
+						</DropdownTrigger>
+						<DropdownMenu
+							onAction={(key) => {
+								const itemTexts: {
+									[Key in
+										| 'autor'
+										| 'nombreLibro'
+										| 'editor'
+										| 'sinopsis']: string;
+								} = {
 									autor: 'Autor',
 									nombreLibro: 'Nombre',
 									editor: 'Editor',
 									sinopsis: 'Sinopsis',
-									};
-									const selectedLabel = itemTexts[key as 'autor' | 'nombreLibro' | 'editor' | 'sinopsis'];
-									if (selectedLabel) {
-									setSearchBy(capitalizeFirstLetter(selectedLabel));
+								};
+								const selectedLabel =
+									itemTexts[
+										key as
+											| 'autor'
+											| 'nombreLibro'
+											| 'editor'
+											| 'sinopsis'
+									];
+								if (selectedLabel) {
+									setSearchBy(
+										capitalizeFirstLetter(selectedLabel),
+									);
+								}
+							}}
+						>
+							<DropdownItem key='autor'>Autor</DropdownItem>
+							<DropdownItem key='nombreLibro'>
+								Nombre
+							</DropdownItem>
+							<DropdownItem key='editor'>Editor</DropdownItem>
+							<DropdownItem key='sinopsis'>Sinopsis</DropdownItem>
+						</DropdownMenu>
+					</Dropdown>
+					<Button onClick={resetFilters}>Restablecer Filtros</Button>
+				</div>
+
+				<Table>
+					<TableHeader>
+						<TableColumn>Nombre</TableColumn>
+						<TableColumn>Autor</TableColumn>
+						<TableColumn>Editor</TableColumn>
+						<TableColumn>Edición</TableColumn>
+						<TableColumn>Año</TableColumn>
+						<TableColumn>Sinopsis</TableColumn>
+						<TableColumn>Acciones</TableColumn>
+					</TableHeader>
+					<TableBody>
+						{libros.map((libro) => (
+							<TableRow key={libro.id}>
+								<TableCell>{libro.nombreLibro}</TableCell>
+								<TableCell>{libro.autor}</TableCell>
+								<TableCell>{libro.editor}</TableCell>
+								<TableCell>{libro.edicion}</TableCell>
+								<TableCell>{libro.anioPublicacion}</TableCell>
+								<TableCell>{libro.sinopsis}</TableCell>
+								<TableCell>{renderActions(libro)}</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+
+				<Pagination
+					total={totalPages}
+					page={page}
+					onChange={(newPage) => setPage(newPage)}
+				/>
+
+				{/* Modal para añadir libro */}
+				<Modal
+					isOpen={showAddModal}
+					onClose={() => setShowAddModal(false)}
+				>
+					<ModalContent>
+						<ModalHeader>Añadir Libro</ModalHeader>
+						<ModalBody>
+							{Object.keys(newLibro).map((key) => (
+								<Input
+									key={key}
+									label={key}
+									value={newLibro[key as keyof Libro]}
+									onChange={(e) =>
+										setNewLibro({
+											...newLibro,
+											[key]: e.target.value,
+										})
 									}
-								}}
-							>
-								<DropdownItem key='autor'>Autor</DropdownItem>
-								<DropdownItem key='nombreLibro'>Nombre</DropdownItem>
-								<DropdownItem key='editor'>Editor</DropdownItem>
-								<DropdownItem key='sinopsis'>Sinopsis</DropdownItem>
-							</DropdownMenu>
-						</Dropdown>
-						<Button onClick={resetFilters}>Restablecer Filtros</Button>
-					</div>
-	
-					<Table>
-						<TableHeader>
-							<TableColumn>Nombre</TableColumn>
-							<TableColumn>Autor</TableColumn>
-							<TableColumn>Editor</TableColumn>
-							<TableColumn>Edición</TableColumn>
-							<TableColumn>Año</TableColumn>
-							<TableColumn>Sinopsis</TableColumn>
-							<TableColumn>Acciones</TableColumn>
-						</TableHeader>
-						<TableBody>
-							{libros.map((libro) => (
-								<TableRow key={libro.id}>
-									<TableCell>{libro.nombreLibro}</TableCell>
-									<TableCell>{libro.autor}</TableCell>
-									<TableCell>{libro.editor}</TableCell>
-									<TableCell>{libro.edicion}</TableCell>
-									<TableCell>{libro.anioPublicacion}</TableCell>
-									<TableCell>{libro.sinopsis}</TableCell>
-									<TableCell>{renderActions(libro)}</TableCell>
-								</TableRow>
+								/>
 							))}
-						</TableBody>
-					</Table>
-	
-					<Pagination
-						total={totalPages}
-						page={page}
-						onChange={(newPage) => setPage(newPage)}
-					/>
-	
-					{/* Modal para añadir libro */}
-					<Modal
-						isOpen={showAddModal}
-						onClose={() => setShowAddModal(false)}
-					>
-						<ModalContent>
-							<ModalHeader>Añadir Libro</ModalHeader>
-							<ModalBody>
-								{Object.keys(newLibro).map((key) => (
+						</ModalBody>
+						<ModalFooter>
+							<Button onClick={() => setShowAddModal(false)}>
+								Cancelar
+							</Button>
+							<Button onClick={handleAddLibro}>Añadir</Button>
+						</ModalFooter>
+					</ModalContent>
+				</Modal>
+
+				{/* Modal para editar libro */}
+				<Modal
+					isOpen={showEditModal}
+					onClose={() => setShowEditModal(false)}
+				>
+					<ModalContent>
+						<ModalHeader>Editar Libro</ModalHeader>
+						<ModalBody>
+							{selectedLibro &&
+								Object.keys(selectedLibro).map((key) => (
 									<Input
 										key={key}
 										label={key}
-										value={newLibro[key as keyof Libro]}
+										value={
+											selectedLibro[key as keyof Libro]
+										}
 										onChange={(e) =>
-											setNewLibro({
-												...newLibro,
-												[key]: e.target.value,
-											})
+											handleEditChange(
+												key as keyof Libro,
+												e.target.value,
+											)
 										}
 									/>
 								))}
-							</ModalBody>
-							<ModalFooter>
-								<Button onClick={() => setShowAddModal(false)}>
-									Cancelar
-								</Button>
-								<Button onClick={handleAddLibro}>
-									Añadir
-								</Button>
-							</ModalFooter>
-						</ModalContent>
-					</Modal>
-	
-					{/* Modal para editar libro */}
-					<Modal
-						isOpen={showEditModal}
-						onClose={() => setShowEditModal(false)}
-					>
-						<ModalContent>
-							<ModalHeader>Editar Libro</ModalHeader>
-							<ModalBody>
-								{selectedLibro &&
-									Object.keys(selectedLibro).map((key) => (
-										<Input
-											key={key}
-											label={key}
-											value={
-												selectedLibro[key as keyof Libro]
-											}
-											onChange={(e) =>
-												handleEditChange(
-													key as keyof Libro,
-													e.target.value,
-												)
-											}
-										/>
-									))}
-							</ModalBody>
-							<ModalFooter>
-								<Button onClick={() => setShowEditModal(false)}>
-									Cancelar
-								</Button>
-								<Button onClick={handleSaveEdit}>
-									Guardar
-								</Button>
-							</ModalFooter>
-						</ModalContent>
-					</Modal>
-				</div>
-				<ToastContainer />
-			</MainLayout>
-		);
-	};
-	
-	export default BooksPage;
-	
+						</ModalBody>
+						<ModalFooter>
+							<Button onClick={() => setShowEditModal(false)}>
+								Cancelar
+							</Button>
+							<Button onClick={handleSaveEdit}>Guardar</Button>
+						</ModalFooter>
+					</ModalContent>
+				</Modal>
+			</div>
+			<ToastContainer />
+		</MainLayout>
+	);
+};
+
+export default BooksPage;
