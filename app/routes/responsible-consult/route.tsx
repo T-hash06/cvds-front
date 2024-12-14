@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import MainLayout from '../../components/layouts/UsersManagementLayout';
 import styles from './responsible.consult.module.css';
+import axios from 'axios';
 
 interface Responsible {
     document: string;
@@ -16,6 +17,14 @@ const ViewResponsibles = () => {
     const [pageSize] = useState(10);
     const [totalResponsibles, setTotalResponsibles] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
+
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+    const [selectedResponsible, setSelectedResponsible] = useState<Responsible | null>(null);
+    const [updatedPhoneNumber, setUpdatedPhoneNumber] = useState('');
+    const [updatedEmail, setUpdatedEmail] = useState('');
+
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [documentToDelete, setDocumentToDelete] = useState('');
 
     useEffect(() => {
         const fetchTotalCount = async () => {
@@ -62,15 +71,57 @@ const ViewResponsibles = () => {
         }
     };
 
+    const handleUpdate = (responsible: Responsible) => {
+        console.log('Updating responsible:', responsible);
+        setSelectedResponsible(responsible);
+        setUpdatedPhoneNumber(responsible.phoneNumber);
+        setUpdatedEmail(responsible.email);
+        setIsUpdateModalOpen(true);
+    };
 
-    const handleUpdate = (document: string) => {
-        console.log('Actualizar responsable con documento:', document);
-        // Lógica para actualizar el responsable
+    const handleSaveUpdate = async () => {
+        if (selectedResponsible) {
+            try {
+                await axios.patch(
+                    `https://usermanagementbibliosoft-c0bhema4b0ewf4hh.eastus-01.azurewebsites.net/users/responsibles/${selectedResponsible.document}/contact`,
+                    {
+                        email: updatedEmail,
+                        phoneNumber: updatedPhoneNumber,
+                    }
+                );
+                setIsUpdateModalOpen(false);
+                setUpdatedEmail('');
+                setUpdatedPhoneNumber('');
+                alert('Responsable actualizado con éxito');
+            } catch (error) {
+                console.error('Error updating responsible:', error);
+                alert('Error al actualizar responsable');
+            }
+        }
     };
 
     const handleDelete = (document: string) => {
-        console.log('Eliminar responsable con documento:', document);
-        // Lógica para eliminar el responsable
+        setDocumentToDelete(document);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        try {
+            await axios.delete(
+                `https://usermanagementbibliosoft-c0bhema4b0ewf4hh.eastus-01.azurewebsites.net/users/delete/${documentToDelete}`
+            );
+            setIsDeleteModalOpen(false);
+            setDocumentToDelete('');
+            alert('Responsable eliminado con éxito');
+        } catch (error) {
+            console.error('Error deleting responsible:', error);
+            alert('Error al eliminar responsable');
+        }
+    };
+
+    const handleCancelDelete = () => {
+        setIsDeleteModalOpen(false);
+        setDocumentToDelete('');
     };
 
     return (
@@ -98,7 +149,7 @@ const ViewResponsibles = () => {
                             <td>
                                 <button
                                     className={styles.updateButton}
-                                    onClick={() => handleUpdate(responsible.document)}
+                                    onClick={() => handleUpdate(responsible)}
                                 >
                                     Actualizar
                                 </button>
@@ -127,6 +178,36 @@ const ViewResponsibles = () => {
                     </button>
                 </div>
             </MainLayout>
+            {isUpdateModalOpen && selectedResponsible && (
+                <div className={styles.modal}>
+                    <div className={styles.modalContent}>
+                        <h2>Actualizar Responsable</h2>
+                        <input
+                            type="email"
+                            value={updatedEmail}
+                            onChange={(e) => setUpdatedEmail(e.target.value)}
+                            placeholder="Email"
+                        />
+                        <input
+                            type="text"
+                            value={updatedPhoneNumber}
+                            onChange={(e) => setUpdatedPhoneNumber(e.target.value)}
+                            placeholder="Teléfono"
+                        />
+                        <button onClick={handleSaveUpdate}>Guardar</button>
+                        <button onClick={() => setIsUpdateModalOpen(false)}>Cancelar</button>
+                    </div>
+                </div>
+            )}
+            {isDeleteModalOpen && (
+                <div className={styles.modal}>
+                    <div className={styles.modalContent}>
+                        <h2>¿Estás seguro de que deseas eliminar este responsable?</h2>
+                        <button onClick={handleConfirmDelete}>Sí, eliminar</button>
+                        <button onClick={handleCancelDelete}>Cancelar</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
