@@ -3,7 +3,6 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import MainLayout from '../../components/layouts/MainLayout';
 import {
 	Button,
 	Checkbox,
@@ -25,8 +24,10 @@ import {
 	TableHeader,
 	TableRow,
 } from '@nextui-org/react';
+import MainLayout from '../../components/layouts/MainLayout';
 
-const API_URL = 'https://backbibliosoft-hefxcthhhadjgxb0.canadacentral-01.azurewebsites.net';
+const API_URL =
+	'https://backbibliosoft-hefxcthhhadjgxb0.canadacentral-01.azurewebsites.net';
 
 interface Ejemplar {
 	id?: string;
@@ -247,179 +248,144 @@ const EjemplaresPage = () => {
 
 	return (
 		<MainLayout>
-		<div className='p-6 bg-blue-50 min-h-screen'>
-			<div className='flex items-center justify-between mb-6'>
-				<Button
-					className='button-secondary'
-					onClick={() => navigate('/books')}
-				>
-					← Volver a Libros
-				</Button>
-				<h1 className='text-3xl font-bold text-blue-700'>
-					Gestión de Ejemplares
-				</h1>
-				<Button
-					className='button-primary'
-					onClick={() => setShowAddModal(true)}
-				>
-					Añadir Ejemplar
-				</Button>
-			</div>
+			<div className='p-6 bg-blue-50 min-h-screen'>
+				<div className='flex items-center justify-between mb-6'>
+					<Button
+						className='button-secondary'
+						onClick={() => navigate('/books')}
+					>
+						← Volver a Libros
+					</Button>
+					<h1 className='text-3xl font-bold text-blue-700'>
+						Gestión de Ejemplares
+					</h1>
+					<Button
+						className='button-primary'
+						onClick={() => setShowAddModal(true)}
+					>
+						Añadir Ejemplar
+					</Button>
+				</div>
 
-			<div className='flex gap-4 mb-6'>
-				<Input
-					className='input-search'
-					placeholder='Escanear Ejemplar...'
-					value={searchTerm}
-					onChange={(e) => setSearchTerm(e.target.value)}
-				/>
-				<Button className='button-primary' onClick={handleScanEjemplar}>
-					Buscar
-				</Button>
-				<Button
-					className='button-secondary'
-					onClick={handleClearFilters}
-				>
-					X
-				</Button>
-			</div>
-			<div className='p-6 bg-white shadow-md rounded-lg mb-6'>
-				<h1 className='text-2xl font-semibold text-blue-700'>{nombreLibro}</h1>
-			</div>
-			<Table aria-label='Lista de ejemplares'>
-				<TableHeader>
-					<TableColumn className='table-header'>Estado</TableColumn>
-					<TableColumn className='table-header'>
-						Disponible
-					</TableColumn>
-					<TableColumn className='table-header'>Acciones</TableColumn>
-					<TableColumn className='table-header'>
-						Código de Barras
-					</TableColumn>
-				</TableHeader>
-				<TableBody>
-					{ejemplares.map((ejemplar) => (
-						<TableRow key={ejemplar.id} className='table-row'>
-							<TableCell>{ejemplar.estado}</TableCell>
-							<TableCell>
-								<Checkbox
-									isSelected={ejemplar.disponible}
-									isDisabled={true}
-								/>
-							</TableCell>
-							<TableCell>{renderActions(ejemplar)}</TableCell>
-							<TableCell>
-								{ejemplar.barcodeURL ? (
-									<a
-										href={ejemplar.barcodeURL}
-										target='_blank'
-										rel='noopener noreferrer'
-									>
-										<img
-											src={ejemplar.barcodeURL}
-											alt='Código de Barras'
-											width='400'
-											height='300'
-										/>
-									</a>
-								) : (
-									'No disponible'
-								)}
-							</TableCell>
-						</TableRow>
-					))}
-				</TableBody>
-			</Table>
-
-			<div className='flex justify-center mt-6'>
-				<Pagination
-					total={totalPages}
-					page={page}
-					onChange={(newPage) => {
-						setPage(newPage);
-						fetchEjemplares();
-					}}
-				/>
-			</div>
-
-			<ToastContainer
-				position='top-right'
-				autoClose={3000}
-				hideProgressBar={true}
-				newestOnTop={true}
-				closeOnClick={true}
-				pauseOnHover={true}
-				draggable={true}
-			/>
-
-			{/* Add Ejemplar Modal */}
-			<Modal isOpen={showAddModal} onOpenChange={setShowAddModal}>
-				<ModalContent>
-					<ModalHeader>
-						<h2>Añadir Nuevo Ejemplar</h2>
-					</ModalHeader>
-					<ModalBody>
-						<Input
-							label='Estado'
-							value={newEjemplar.estado}
-							onChange={(e) =>
-								setNewEjemplar({
-									...newEjemplar,
-									estado: e.target.value,
-								})
-							}
-						/>
-						<Checkbox
-							isSelected={newEjemplar.disponible}
-							onChange={(e) =>
-								setNewEjemplar({
-									...newEjemplar,
-									disponible: e.target.checked,
-								})
-							}
-						>
+				<div className='flex gap-4 mb-6'>
+					<Input
+						className='input-search'
+						placeholder='Escanear Ejemplar...'
+						value={searchTerm}
+						onChange={(e) => setSearchTerm(e.target.value)}
+					/>
+					<Button
+						className='button-primary'
+						onClick={handleScanEjemplar}
+					>
+						Buscar
+					</Button>
+					<Button
+						className='button-secondary'
+						onClick={handleClearFilters}
+					>
+						X
+					</Button>
+				</div>
+				<div className='p-6 bg-white shadow-md rounded-lg mb-6'>
+					<h1 className='text-2xl font-semibold text-blue-700'>
+						{nombreLibro}
+					</h1>
+				</div>
+				<Table aria-label='Lista de ejemplares'>
+					<TableHeader>
+						<TableColumn className='table-header'>
+							Estado
+						</TableColumn>
+						<TableColumn className='table-header'>
 							Disponible
-						</Checkbox>
-					</ModalBody>
-					<ModalFooter>
-						<Button
-							className='button-primary'
-							onClick={handleAddEjemplar}
-						>
-							Confirmar
-						</Button>
-						<Button
-							className='button-secondary'
-							onClick={() => setShowAddModal(false)}
-						>
-							Cancelar
-						</Button>
-					</ModalFooter>
-				</ModalContent>
-			</Modal>
+						</TableColumn>
+						<TableColumn className='table-header'>
+							Acciones
+						</TableColumn>
+						<TableColumn className='table-header'>
+							Código de Barras
+						</TableColumn>
+					</TableHeader>
+					<TableBody>
+						{ejemplares.map((ejemplar) => (
+							<TableRow key={ejemplar.id} className='table-row'>
+								<TableCell>{ejemplar.estado}</TableCell>
+								<TableCell>
+									<Checkbox
+										isSelected={ejemplar.disponible}
+										isDisabled={true}
+									/>
+								</TableCell>
+								<TableCell>{renderActions(ejemplar)}</TableCell>
+								<TableCell>
+									{ejemplar.barcodeURL ? (
+										<a
+											href={ejemplar.barcodeURL}
+											target='_blank'
+											rel='noopener noreferrer'
+										>
+											<img
+												src={ejemplar.barcodeURL}
+												alt='Código de Barras'
+												width='400'
+												height='300'
+											/>
+										</a>
+									) : (
+										'No disponible'
+									)}
+								</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
 
-			{/* Edit Ejemplar Modal */}
-			{selectedEjemplar && (
-				<Modal isOpen={showEditModal} onOpenChange={setShowEditModal}>
+				<div className='flex justify-center mt-6'>
+					<Pagination
+						total={totalPages}
+						page={page}
+						onChange={(newPage) => {
+							setPage(newPage);
+							fetchEjemplares();
+						}}
+					/>
+				</div>
+
+				<ToastContainer
+					position='top-right'
+					autoClose={3000}
+					hideProgressBar={true}
+					newestOnTop={true}
+					closeOnClick={true}
+					pauseOnHover={true}
+					draggable={true}
+				/>
+
+				{/* Add Ejemplar Modal */}
+				<Modal isOpen={showAddModal} onOpenChange={setShowAddModal}>
 					<ModalContent>
 						<ModalHeader>
-							<h2>Editar Ejemplar</h2>
+							<h2>Añadir Nuevo Ejemplar</h2>
 						</ModalHeader>
 						<ModalBody>
 							<Input
 								label='Estado'
-								value={selectedEjemplar.estado}
+								value={newEjemplar.estado}
 								onChange={(e) =>
-									handleEditChange('estado', e.target.value)
+									setNewEjemplar({
+										...newEjemplar,
+										estado: e.target.value,
+									})
 								}
 							/>
 							<Checkbox
-								isSelected={selectedEjemplar.disponible}
+								isSelected={newEjemplar.disponible}
 								onChange={(e) =>
-									handleEditChange(
-										'disponible',
-										e.target.checked,
-									)
+									setNewEjemplar({
+										...newEjemplar,
+										disponible: e.target.checked,
+									})
 								}
 							>
 								Disponible
@@ -428,21 +394,71 @@ const EjemplaresPage = () => {
 						<ModalFooter>
 							<Button
 								className='button-primary'
-								onClick={handleSaveEdit}
+								onClick={handleAddEjemplar}
 							>
 								Confirmar
 							</Button>
 							<Button
 								className='button-secondary'
-								onClick={() => setShowEditModal(false)}
+								onClick={() => setShowAddModal(false)}
 							>
 								Cancelar
 							</Button>
 						</ModalFooter>
 					</ModalContent>
 				</Modal>
-			)}
-		</div>
+
+				{/* Edit Ejemplar Modal */}
+				{selectedEjemplar && (
+					<Modal
+						isOpen={showEditModal}
+						onOpenChange={setShowEditModal}
+					>
+						<ModalContent>
+							<ModalHeader>
+								<h2>Editar Ejemplar</h2>
+							</ModalHeader>
+							<ModalBody>
+								<Input
+									label='Estado'
+									value={selectedEjemplar.estado}
+									onChange={(e) =>
+										handleEditChange(
+											'estado',
+											e.target.value,
+										)
+									}
+								/>
+								<Checkbox
+									isSelected={selectedEjemplar.disponible}
+									onChange={(e) =>
+										handleEditChange(
+											'disponible',
+											e.target.checked,
+										)
+									}
+								>
+									Disponible
+								</Checkbox>
+							</ModalBody>
+							<ModalFooter>
+								<Button
+									className='button-primary'
+									onClick={handleSaveEdit}
+								>
+									Confirmar
+								</Button>
+								<Button
+									className='button-secondary'
+									onClick={() => setShowEditModal(false)}
+								>
+									Cancelar
+								</Button>
+							</ModalFooter>
+						</ModalContent>
+					</Modal>
+				)}
+			</div>
 		</MainLayout>
 	);
 };
