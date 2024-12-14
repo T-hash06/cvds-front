@@ -18,12 +18,12 @@ interface MainLayoutProps {
 }
 
 const MainLayout: FC<MainLayoutProps> = ({ children }) => {
-	const navigate = useNavigate();
-	if (!getToken()) {
-		navigate('/auth/login');
-	} else {
-		navigate('/general');
-	}
+	// const navigate = useNavigate();
+	// if (!getToken()) {
+	// 	navigate('/auth/login');
+	// } else {
+	// 	navigate('/general');
+	// }
 	return (
 		<div className='main-layout'>
 			<Navbar />
