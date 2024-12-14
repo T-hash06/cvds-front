@@ -29,7 +29,7 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 1.5rem 2rem 2rem;
+	padding: 1rem 2rem 2rem;
 	width: 100%;
 }
 
@@ -74,4 +74,18 @@
 	border-left: 1px solid #d1d5db;
 	height: auto;
 	margin: 0 1rem;
+}
+
+.errorMessage {
+	color: #dc2626;
+	background-color: #fef2f2;
+	border: 1px solid #fee2e2;
+	padding: 1rem;
+	border-radius: 0.5rem;
+	margin-bottom: 1rem;
+}
+
+.buttonCustom:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
 }

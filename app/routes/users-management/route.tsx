@@ -1,14 +1,12 @@
-import {
-	Button,
-} from '@nextui-org/react';
-import MainLayout from '../../components/layouts/MainLayout';
-import styles from './users-management.module.css';
+import { Button } from '@nextui-org/react';
 import { Link } from '@remix-run/react';
-import registrarEstudiante from './assets/registrar_estudiante.svg';
-import registrarResponsable from './assets/registrar_responsable.svg';
-import registrarCurso from './assets/registrar_curso.svg';
+import MainLayout from '../../components/layouts/MainLayout';
 import consultarEstudiantes from './assets/consultar_estudiantes.svg';
 import consultarResponsables from './assets/consultar_responsables.svg';
+import registrarCurso from './assets/registrar_curso.svg';
+import registrarEstudiante from './assets/registrar_estudiante.svg';
+import registrarResponsable from './assets/registrar_responsable.svg';
+import styles from './users-management.module.css';
 
 // Definir la interfaz para las props de StudentCard
 interface StudentCardProps {
@@ -24,20 +22,14 @@ const Title = () => {
 const StudentCard: React.FC<StudentCardProps> = ({ image, title, onClick }) => {
 	return (
 		<div className={styles.studentCard}>
-			<img
-				src={image}
-				alt={title}
-				className={styles.studentIcon}
-			/>
+			<img src={image} alt={title} className={styles.studentIcon} />
 			<Button
-				color="secondary"
-				radius="full"
-				variant="light"
+				color='secondary'
+				radius='full'
+				variant='light'
 				onClick={onClick}
 			>
-				<h2 className={styles.studentCardTitle}>
-					{title}
-				</h2>
+				<h2 className={styles.studentCardTitle}>{title}</h2>
 			</Button>
 		</div>
 	);
@@ -45,50 +37,58 @@ const StudentCard: React.FC<StudentCardProps> = ({ image, title, onClick }) => {
 
 const RegisterStudent = () => {
 	return (
-		<StudentCard
-			image={registrarEstudiante}
-			title="Registrar Estudiante"
-			onClick={() => {}}
-		/>
+		<Link to='/students-add' style={{ textDecoration: 'none' }}>
+			<StudentCard
+				image={registrarEstudiante}
+				title='Registrar Estudiante'
+				onClick={() => {}}
+			/>
+		</Link>
 	);
 };
 
 const RegisterGuardian = () => {
 	return (
-		<StudentCard
-			image={registrarResponsable}
-			title="Registrar Responsable"
-			onClick={() => {}}
-		/>
+		<Link to='/responsible-add' style={{ textDecoration: 'none' }}>
+			<StudentCard
+				image={registrarResponsable}
+				title='Registrar Responsable'
+				onClick={() => {}}
+			/>
+		</Link>
 	);
 };
 
 const RegisterCourse = () => {
 	return (
-		<StudentCard
-			image={registrarCurso}
-			title="Registrar Curso"
-			onClick={() => {}}
-		/>
+		<Link to='/course-add' style={{ textDecoration: 'none' }}>
+			<StudentCard
+				image={registrarCurso}
+				title='Registrar Curso'
+				onClick={() => {}}
+			/>
+		</Link>
 	);
 };
 
 const ViewStudents = () => {
 	return (
-		<StudentCard
-			image={consultarEstudiantes}
-			title="Consulta de Estudiantes"
-			onClick={() => {}}
-		/>
+		<Link to='/student-consult' style={{ textDecoration: 'none' }}>
+			<StudentCard
+				image={consultarEstudiantes}
+				title='Consulta de Estudiantes'
+				onClick={() => {}}
+			/>
+		</Link>
 	);
 };
 
 const ViewGuardians = () => {
 	return (
-		<Link to="/responsible-consult" style={{ textDecoration: 'none' }}>
+		<Link to='/responsible-consult' style={{ textDecoration: 'none' }}>
 			<StudentCard
 				image={consultarResponsables}
-				title="Consulta de Responsables"
+				title='Consulta de Responsables'
 				onClick={() => {}}
 			/>
 		</Link>
