@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import MainLayout from '../../components/layouts/MainLayout';
 import {
 	Button,
 	Checkbox,
@@ -25,7 +26,7 @@ import {
 	TableRow,
 } from '@nextui-org/react';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'https://backbibliosoft-hefxcthhhadjgxb0.canadacentral-01.azurewebsites.net';
 
 interface Ejemplar {
 	id?: string;
@@ -104,7 +105,6 @@ const EjemplaresPage = () => {
 
 			setEjemplares(ejemplaresWithBarcode);
 			setTotalPages(Math.ceil(response.data.length / rowsPerPage));
-			toast.success('Ejemplares cargados satisfactoriamente');
 		} catch (error) {
 			console.error('Error al obtener ejemplares:', error);
 			toast.error('No se pudo cargar los ejemplares');
@@ -246,6 +246,7 @@ const EjemplaresPage = () => {
 	);
 
 	return (
+		<MainLayout>
 		<div className='p-6 bg-blue-50 min-h-screen'>
 			<div className='flex items-center justify-between mb-6'>
 				<Button
@@ -255,7 +256,7 @@ const EjemplaresPage = () => {
 					← Volver a Libros
 				</Button>
 				<h1 className='text-3xl font-bold text-blue-700'>
-					Gestión de Ejemplares para {nombreLibro}
+					Gestión de Ejemplares
 				</h1>
 				<Button
 					className='button-primary'
@@ -282,7 +283,9 @@ const EjemplaresPage = () => {
 					X
 				</Button>
 			</div>
-
+			<div className='p-6 bg-white shadow-md rounded-lg mb-6'>
+				<h1 className='text-2xl font-semibold text-blue-700'>{nombreLibro}</h1>
+			</div>
 			<Table aria-label='Lista de ejemplares'>
 				<TableHeader>
 					<TableColumn className='table-header'>Estado</TableColumn>
@@ -440,6 +443,7 @@ const EjemplaresPage = () => {
 				</Modal>
 			)}
 		</div>
+		</MainLayout>
 	);
 };
 
