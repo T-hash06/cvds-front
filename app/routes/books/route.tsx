@@ -27,7 +27,7 @@ import {
 	TableRow,
 } from '@nextui-org/react';
 
-const API_URL = 'https://backbibliosoft-hefxcthhhadjgxb0.canadacentral-01.azurewebsites.net';
+const API_URL = 'https://odyv7fszai.execute-api.us-east-1.amazonaws.com/BiblioSoftAPI/';
 
 if (typeof window !== 'undefined') {
 	localStorage.setItem(
@@ -36,7 +36,7 @@ if (typeof window !== 'undefined') {
 	);
 	const token = localStorage.getItem('token');
 	if (token) {
-		axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+		// axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 	}
 }
 
