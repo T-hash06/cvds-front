@@ -1,7 +1,9 @@
 import {
 	Button,
 	Input,
-	Divider
+	Divider,
+	Autocomplete,
+	AutocompleteItem
 } from '@nextui-org/react';
 import { useState } from 'react';
 import UsersManagementLayout from '../../components/layouts/UsersManagementLayout';
@@ -18,6 +20,30 @@ const SubtitleStudent = () => {
 const SubtitleResponsible = () => {
 	return <h2 className={styles.subtitle}>Información del Responsable</h2>
 };
+
+const typesDocument = [
+	{label: "NUIP", key: "NUIP"},
+	{label: "Registro Civil", key: "REGISTRO CIVIL"},
+	{label: "TI", key: "TI"},
+];
+
+const grades = [
+	{label: "1", key: "1"},
+	{label: "2", key: "2"},
+	{label: "3", key: "3"},
+	{label: "4", key: "4"},
+	{label: "5", key: "5"},
+	{label: "6", key: "6"},
+] // OBTENER DE BACK
+
+const courses = [
+	{label: "101", key: "101"},
+	{label: "201", key: "201"},
+	{label: "301", key: "301"},
+	{label: "401", key: "401"},
+	{label: "501", key: "501"},
+	{label: "601", key: "601"},
+] // OBTENER DE BACK
 
 const AddStudent = () => {
 	const [formData, setFormData] = useState({
@@ -102,15 +128,19 @@ const AddStudent = () => {
 								value={formData.studentName}
 								onChange={handleChange}
 							/> <br/>
-							<Input
+							<Autocomplete
 								isRequired
 								key={"outside"}
+								className="max-w-xs"
+								defaultItems={typesDocument}
 								label="Tipo de Documento"
 								labelPlacement={"outside"}
 								name="typeDoc"
 								value={formData.typeDoc}
 								onChange={handleChange}
-							/> <br/>
+							>
+								{(item) => <AutocompleteItem key={item.key}>{item.label}</AutocompleteItem>}
+							</Autocomplete> <br/><br/>
 							<Input
 								isRequired
 								key={"outside"}
@@ -120,28 +150,36 @@ const AddStudent = () => {
 								value={formData.studentDoc}
 								onChange={handleChange}
 							/> <br/>
-							<Input
+							<Autocomplete
 								isRequired
 								key={"outside"}
+								className="max-w-xs"
+								defaultItems={grades}
 								label="Grado"
 								labelPlacement={"outside"}
 								name="grade"
 								value={formData.grade}
 								onChange={handleChange}
-							/>
+							>
+								{(item) => <AutocompleteItem key={item.key}>{item.label}</AutocompleteItem>}
+							</Autocomplete> <br/><br/>
 						</div>
 						<div className={styles.verticalDivider}></div>
 						<div className={styles.column}>
 							<br/><br/>
-							<Input
+							<Autocomplete
 								isRequired
 								key={"outside"}
+								className="max-w-xs"
+								defaultItems={courses}
 								label="Curso"
 								labelPlacement={"outside"}
 								name="course"
 								value={formData.course}
 								onChange={handleChange}
-							/> <br/>
+							>
+								{(item) => <AutocompleteItem key={item.key}>{item.label}</AutocompleteItem>}
+							</Autocomplete> <br/><br/>
 							<Input
 								isRequired
 								key={"outside"}
