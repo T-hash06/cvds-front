@@ -5,11 +5,11 @@ import { CiMenuBurger, CiMenuFries } from 'react-icons/ci';
 const sectionsByRole: Record<string, { name: string; path: string }[]> = {
     admin: [
         { name: 'Inicio', path: '/admin/home' },
-        { name: 'Adicionar Estudiante', path: '/students/add' },
-        { name: 'Adicionar Responsable', path: '/responsible/add' },
+        { name: 'Adicionar Estudiante', path: '/students-add' },
+        { name: 'Adicionar Responsable', path: '/responsible-add' },
         { name: 'Adicionar Curso', path: '/course/add' },
         { name: 'Consultar Estudiante', path: '/student/consult' },
-        { name: 'Consultar Responsable', path: '/responsible/consult' },
+        { name: 'Consultar Responsable', path: '/responsible-consult' },
         { name: 'Soporte', path: '/admin/support' },
         { name: 'Salir', path: '/logout' },
     ],

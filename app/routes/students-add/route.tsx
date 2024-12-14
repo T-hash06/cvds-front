@@ -93,6 +93,7 @@ const AddStudent = () => {
 								key={"outside"}
 								label="Nombres y Apellidos Completos"
 								labelPlacement={"outside"}
+								name={"studentName"}
 								value={formData.studentName}
 								onChange={handleChange}
 							/> <br/>
@@ -101,6 +102,7 @@ const AddStudent = () => {
 								key={"outside"}
 								label="Tipo de Documento"
 								labelPlacement={"outside"}
+								name="typeDoc"
 								value={formData.typeDoc}
 								onChange={handleChange}
 							/> <br/>
@@ -109,6 +111,7 @@ const AddStudent = () => {
 								key={"outside"}
 								label="Número de Documento"
 								labelPlacement={"outside"}
+								name="studentDoc"
 								value={formData.studentDoc}
 								onChange={handleChange}
 							/> <br/>
@@ -117,6 +120,7 @@ const AddStudent = () => {
 								key={"outside"}
 								label="Grado"
 								labelPlacement={"outside"}
+								name="grade"
 								value={formData.grade}
 								onChange={handleChange}
 							/> <br/>
@@ -125,6 +129,7 @@ const AddStudent = () => {
 								key={"outside"}
 								label="Curso"
 								labelPlacement={"outside"}
+								name="course"
 								value={formData.course}
 								onChange={handleChange}
 							/>
