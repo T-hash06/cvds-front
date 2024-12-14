@@ -1,0 +1,97 @@
+.mainContainer {
+	display: flex;
+	min-height: 100vh;
+	width: 100%;
+}
+
+.mainContainer :global(.main-layout) {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	width: 100%;
+}
+
+.mainContainer :global(.main-layout > div) {
+	display: flex;
+	flex: 1;
+}
+
+.mainContainer :global(.main-layout main) {
+	flex: 1;
+	background-color: #f9fafb;
+}
+
+.studentsPage {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 1.5rem 2rem 2rem;
+	width: 100%;
+}
+
+.title {
+	font-size: 2rem;
+	font-weight: bold;
+	color: #1f2937;
+	text-align: center;
+}
+
+.studentsModules {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 2rem;
+	width: 100%;
+	max-width: 1000px;
+	padding: 1rem;
+}
+
+.studentCard {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 1.5rem;
+	background: white;
+	border-radius: 1rem;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	transition: transform 0.2s;
+	width: 250px;
+}
+
+.studentCard:hover {
+	transform: translateY(-4px);
+}
+
+.studentIcon {
+	width: 120px;
+	height: 120px;
+	margin-bottom: 1rem;
+	object-fit: contain;
+}
+
+.studentCardTitle {
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: #4b5563;
+	text-align: center;
+	margin: 0;
+}
+
+/* Media queries para responsividad */
+@media (max-width: 840px) {
+	.studentsModules {
+		max-width: 600px;
+	}
+}
+
+@media (max-width: 540px) {
+	.studentsModules {
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.studentCard {
+		width: 100%;
+		max-width: 300px;
+	}
+}
