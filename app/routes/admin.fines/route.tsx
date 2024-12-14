@@ -2,8 +2,8 @@ import {
 	Button,
 	Card,
 	CardBody,
+	CardFooter,
 	CardHeader,
-	Spacer,
 	Table,
 	TableBody,
 	TableCell,
@@ -11,6 +11,7 @@ import {
 	TableHeader,
 	TableRow,
 } from '@nextui-org/react';
+import { Pagination } from '@nextui-org/react';
 import { useAxios } from '@shared/hooks/axios';
 import axios from 'axios';
 import cookies from 'js-cookie';
@@ -119,46 +120,43 @@ const TableFines: React.FC<TableFineProps> = ({ fines }) => (
 );
 const MainContent = () => {
 	const [fines, setFines] = React.useState<FineDTO[]>([]);
-	const fetchers = React.useRef({
-		getFines: async (page: number, size: number) => {
-			const token = cookies.get('$$id');
-			const response = await axios
-				.get(
-					`https://odyv7fszai.execute-api.us-east-1.amazonaws.com/BiblioSoftAPI/notifications/admin/fines-pending?page=${page}&size=${size}`,
-					{
-						headers: {
-							authorization: `Bearer ${token}`,
-							'Content-Type': 'application/json',
-						},
-					},
-				)
-				.then((response) => {
-					return response.data;
-				})
-				.catch((error) => {
-					console.error('Error:', error); // Maneja el error
-					return {
-						data: [],
-						totalItems: 0,
-						totalPages: 1,
-					};
-				});
-			return response;
-		},
-	});
-	React.useEffect(() => {
-		// Simula carga de datos de API
-		const fetchAndSetFines = async () => {
-			const fines = await fetchers.current.getFines(0, 10);
-			setFines(fines.data);
-		};
+	const [currentPage, setCurrentPage] = React.useState(1); // Cambiado a 1-indexado
+	const [totalPages, setTotalPages] = React.useState(1);
+	const itemsPerPage = 10;
 
-		fetchAndSetFines();
-	}, []);
+	const fetchFines = React.useCallback(async (page: number) => {
+		try {
+			const token = cookies.get('$$id');
+			const response = await axios.get(
+				`https://odyv7fszai.execute-api.us-east-1.amazonaws.com/BiblioSoftAPI/notifications/admin/fines-pending?page=${page - 1}&size=${itemsPerPage}`,
+				{
+					headers: {
+						authorization: `Bearer ${token}`,
+						'Content-Type': 'application/json',
+					},
+				},
+			);
+			setFines(response.data.data);
+			setTotalPages(response.data.totalPages);
+		} catch (error) {
+			console.error('Error:', error);
+			setFines([]);
+			setTotalPages(1);
+		}
+	}, []); // Dependencia: itemsPerPage
+
+	React.useEffect(() => {
+		fetchFines(currentPage);
+	}, [fetchFines, currentPage]); // Dependencias: fetchFines y currentPage
+
+	const handlePageChange = (page: number) => {
+		setCurrentPage(page);
+	};
 
 	const generateReport = () => {
 		generatePDF(fines);
 	};
+
 	return (
 		<Card className='card-admin-fines'>
 			<CardHeader className='flex justify-center items-center p-4'>
@@ -168,13 +166,19 @@ const MainContent = () => {
 			</CardHeader>
 			<CardBody className='flex flex-col gap-4'>
 				<TableFines fines={fines} />
-				<div className='flex justify-left'>
-					<Button color='default' onClick={generateReport}>
-						Generar Reporte
-					</Button>
-				</div>
-				<Spacer y={2} />
 			</CardBody>
+			<CardFooter className='flex flex-col sm:flex-row justify-center items-center gap-4'>
+				<Button color='default' onClick={generateReport}>
+					Generar Reporte
+				</Button>
+				<Pagination
+					total={totalPages}
+					page={currentPage}
+					onChange={handlePageChange}
+					color='default'
+					className='flex justify-center items-center p-4'
+				/>
+			</CardFooter>
 		</Card>
 	);
 };

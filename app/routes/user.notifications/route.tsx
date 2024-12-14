@@ -1,6 +1,7 @@
 import {
 	Card,
 	CardBody,
+	CardFooter,
 	CardHeader,
 	Spacer,
 	Tab,
@@ -12,6 +13,7 @@ import {
 	TableRow,
 	Tabs,
 } from '@nextui-org/react';
+import { Pagination } from '@nextui-org/react';
 import MainLayout from 'app/components/layouts/MainLayout';
 import axios from 'axios';
 import cookies from 'js-cookie';
@@ -151,12 +153,18 @@ const TableFines: React.FC<TableFineProps> = ({ fines }) => (
 interface TokenPayload {
 	id: string;
 }
-
 const MainContent = () => {
 	const [fines, setFines] = React.useState<FineDTO[]>([]);
 	const [notifications, setNotifications] = React.useState<NotificationDTO[]>(
 		[],
 	);
+	const [currentPageFines, setCurrentPageFines] = React.useState(1);
+	const [currentPageNotifications, setCurrentPageNotifications] =
+		React.useState(1);
+	const [totalPagesFines, setTotalPagesFines] = React.useState(1);
+	const [totalPagesNotifications, setTotalPagesNotifications] =
+		React.useState(1);
+	const itemsPerPage = 10;
 
 	const getUserId = (token: string | undefined): string | null => {
 		try {
@@ -173,6 +181,7 @@ const MainContent = () => {
 			return 'no';
 		}
 	};
+
 	const fetchers = React.useRef({
 		getNotifications: async (page: number, size: number) => {
 			const token = cookies.get('$$id');
@@ -228,21 +237,29 @@ const MainContent = () => {
 			return response;
 		},
 	});
-	React.useEffect(() => {
-		const fetchData = async () => {
-			const fines = await fetchers.current.getFines(0, 10);
-			const notifications = await fetchers.current.getNotifications(
-				0,
-				10,
-			);
-			// Simula carga de datos de API
 
-			setFines(fines.data);
-			setNotifications(notifications.data);
-		};
-
-		fetchData();
+	const fetchFines = React.useCallback(async (page: number) => {
+		const fines = await fetchers.current.getFines(page - 1, itemsPerPage);
+		setFines(fines.data);
+		setTotalPagesFines(fines.totalPages);
 	}, []);
+
+	const fetchNotifications = React.useCallback(async (page: number) => {
+		const notifications = await fetchers.current.getNotifications(
+			page - 1,
+			itemsPerPage,
+		);
+		setNotifications(notifications.data);
+		setTotalPagesNotifications(notifications.totalPages);
+	}, []);
+
+	React.useEffect(() => {
+		fetchFines(currentPageFines); // Llama la función cuando currentPageFines cambia
+	}, [currentPageFines, fetchFines]);
+
+	React.useEffect(() => {
+		fetchNotifications(currentPageNotifications); // Llama la función cuando currentPageNotifications cambia
+	}, [currentPageNotifications, fetchNotifications]);
 	return (
 		<Card className='card-user-fines'>
 			<CardHeader className='flex justify-center items-center p-4'>
@@ -254,12 +271,34 @@ const MainContent = () => {
 				<Tabs aria-label='Dynamic tabs'>
 					<Tab key='fines' title='Multas'>
 						<TableFines fines={fines} />
+						<CardFooter className='flex flex-col sm:flex-row justify-center items-center gap-4'>
+							{/* Paginación para Multas */}
+							<Pagination
+								total={totalPagesFines}
+								page={currentPageFines}
+								onChange={setCurrentPageFines}
+								color='default'
+								className='hidden sm:flex'
+								variant='light'
+							/>
+						</CardFooter>
 					</Tab>
 					<Tab key='notifications' title='Notificaciones'>
 						<TableNotifications notifications={notifications} />
+
+						<CardFooter className='flex flex-col sm:flex-row justify-center items-center gap-4'>
+							{/* Paginación para Notificaciones */}
+							<Pagination
+								total={totalPagesNotifications}
+								page={currentPageNotifications}
+								onChange={setCurrentPageNotifications}
+								color='default'
+								className='hidden sm:flex'
+								variant='light'
+							/>
+						</CardFooter>
 					</Tab>
 				</Tabs>
-
 				<Spacer y={2} />
 			</CardBody>
 		</Card>
