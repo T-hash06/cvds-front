@@ -1,122 +1,99 @@
-import { Button } from '@nextui-org/react';
+import {
+	Button,
+} from '@nextui-org/react';
 import { useState } from 'react';
+import MainLayout from '../../components/layouts/MainLayout';
 import styles from './students.module.css';
 
-// Importar las imágenes (asumiendo que se agregarán después)
 import registrarEstudiante from './assets/registrar_estudiante.svg';
 import registrarResponsable from './assets/registrar_responsable.svg';
 import registrarCurso from './assets/registrar_curso.svg';
 import consultarEstudiantes from './assets/consultar_estudiantes.svg';
 import consultarResponsables from './assets/consultar_responsables.svg';
 
-/**
- * Title component that renders the main heading
- */
+// Definir la interfaz para las props de StudentCard
+interface StudentCardProps {
+	image: string;
+	title: string;
+	onClick: () => void;
+}
+
 const Title = () => {
 	return <h1 className={styles.title}>¿Qué quieres realizar?</h1>;
 };
 
-/**
- * RegisterStudent component for student registration functionality
- */
+const StudentCard: React.FC<StudentCardProps> = ({ image, title, onClick }) => {
+	return (
+		<div className={styles.studentCard}>
+			<img
+				src={image}
+				alt={title}
+				className={styles.studentIcon}
+			/>
+			<Button
+				color="secondary"
+				radius="full"
+				variant="light"
+				onClick={onClick}
+			>
+				<h2 className={styles.studentCardTitle}>
+					{title}
+				</h2>
+			</Button>
+		</div>
+	);
+};
+
 const RegisterStudent = () => {
 	return (
-		<div className={styles.studentCard}>
-			<img
-				src={registrarEstudiante}
-				alt='Registrar Estudiante'
-				className={styles.studentIcon}
-			/>
-			<Button color='secondary' radius='full' variant='light'>
-				<h2 className={styles.studentCardTitle}>
-					Registrar Estudiante
-				</h2>
-			</Button>
-		</div>
+		<StudentCard
+			image={registrarEstudiante}
+			title="Registrar Estudiante"
+			onClick={() => {}}
+		/>
 	);
 };
 
-/**
- * RegisterGuardian component for guardian registration functionality
- */
 const RegisterGuardian = () => {
 	return (
-		<div className={styles.studentCard}>
-			<img
-				src={registrarResponsable}
-				alt='Registrar Responsable'
-				className={styles.studentIcon}
-			/>
-			<Button color='secondary' radius='full' variant='light'>
-				<h2 className={styles.studentCardTitle}>
-					Registrar Responsable
-				</h2>
-			</Button>
-		</div>
+		<StudentCard
+			image={registrarResponsable}
+			title="Registrar Responsable"
+			onClick={() => {}}
+		/>
 	);
 };
 
-/**
- * RegisterCourse component for course registration functionality
- */
 const RegisterCourse = () => {
 	return (
-		<div className={styles.studentCard}>
-			<img
-				src={registrarCurso}
-				alt='Registrar Curso'
-				className={styles.studentIcon}
-			/>
-			<Button color='secondary' radius='full' variant='light'>
-				<h2 className={styles.studentCardTitle}>Registrar Curso</h2>
-			</Button>
-		</div>
+		<StudentCard
+			image={registrarCurso}
+			title="Registrar Curso"
+			onClick={() => {}}
+		/>
 	);
 };
 
-/**
- * ViewStudents component for student consultation functionality
- */
 const ViewStudents = () => {
 	return (
-		<div className={styles.studentCard}>
-			<img
-				src={consultarEstudiantes}
-				alt='Consulta de Estudiantes'
-				className={styles.studentIcon}
-			/>
-			<Button color='secondary' radius='full' variant='light'>
-				<h2 className={styles.studentCardTitle}>
-					Consulta de Estudiantes
-				</h2>
-			</Button>
-		</div>
+		<StudentCard
+			image={consultarEstudiantes}
+			title="Consulta de Estudiantes"
+			onClick={() => {}}
+		/>
 	);
 };
 
-/**
- * ViewGuardians component for guardian consultation functionality
- */
 const ViewGuardians = () => {
 	return (
-		<div className={styles.studentCard}>
-			<img
-				src={consultarResponsables}
-				alt='Consulta de Responsables'
-				className={styles.studentIcon}
-			/>
-			<Button color='secondary' radius='full' variant='light'>
-				<h2 className={styles.studentCardTitle}>
-					Consulta de Responsables
-				</h2>
-			</Button>
-		</div>
+		<StudentCard
+			image={consultarResponsables}
+			title="Consulta de Responsables"
+			onClick={() => {}}
+		/>
 	);
 };
 
-/**
- * Modules component that combines all the functionality cards
- */
 const Modules = () => {
 	return (
 		<div className={styles.studentsModules}>
@@ -129,15 +106,16 @@ const Modules = () => {
 	);
 };
 
-/**
- * Main Students component that renders the entire page
- */
 const Students = () => {
 	return (
-		<main className={styles.studentsPage}>
-			<Title />
-			<Modules />
-		</main>
+		<div className={styles.mainContainer}>
+			<MainLayout>
+				<div className={styles.studentsPage}>
+					<Title />
+					<Modules />
+				</div>
+			</MainLayout>
+		</div>
 	);
 };
 
