@@ -3,7 +3,7 @@ import {
 } from '@nextui-org/react';
 import MainLayout from '../../components/layouts/MainLayout';
 import styles from './users-management.module.css';
-
+import { Link } from '@remix-run/react';
 import registrarEstudiante from './assets/registrar_estudiante.svg';
 import registrarResponsable from './assets/registrar_responsable.svg';
 import registrarCurso from './assets/registrar_curso.svg';
@@ -85,11 +85,13 @@ const ViewStudents = () => {
 
 const ViewGuardians = () => {
 	return (
-		<StudentCard
-			image={consultarResponsables}
-			title="Consulta de Responsables"
-			onClick={() => {}}
-		/>
+		<Link to="/responsible-consult" style={{ textDecoration: 'none' }}>
+			<StudentCard
+				image={consultarResponsables}
+				title="Consulta de Responsables"
+				onClick={() => {}}
+			/>
+		</Link>
 	);
 };
 
